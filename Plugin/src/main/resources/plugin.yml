@@ -1,0 +1,15 @@
+name: Barium
+version: '${project.version}'
+main: me.etho.barium.Barium
+api-version: 1.19
+load: STARTUP
+authors: [ Etho ]
+description: Remote based java minecraft anti cheat
+
+softdepend:
+  - ProtocolLib
+  - ProtocolSupport
+  - ViaVersion
+  - ViaBackwards
+  - ViaRewind
+  - Geyser-Spigot
