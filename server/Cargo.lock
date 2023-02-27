@@ -1279,11 +1279,13 @@ dependencies = [
 name = "server"
 version = "0.1.0"
 dependencies = [
+ "byteorder",
  "rand",
  "rocket",
  "serde",
  "serde_json",
  "sled",
+ "tokio",
  "utoipa",
  "utoipa-swagger-ui",
 ]
