@@ -8,6 +8,11 @@ use crate::apis::plugin::server_manager::server_manager;
 
 pub mod anticheat {
     pub mod node_manager;
+
+    pub mod node {
+        pub mod node;
+        pub mod player;
+    }
 }
 
 pub mod apis {
@@ -18,6 +23,7 @@ pub mod apis {
         pub mod packets {
             pub mod packet;
             pub mod service;
+            pub mod play;
         }
         pub mod server_manager;
     }

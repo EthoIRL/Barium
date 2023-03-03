@@ -1,31 +1,6 @@
 pub mod node_manager {
-    use serde::{Serialize, Deserialize};
+    use crate::anticheat::node::node::node::Node;
 
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub struct Node {
-        // pub barium_key: String,
-        // pub server_hardware_id: String,
-        // pub server_ip: String,
-
-        pub server_version: String,
-        // pub server_region: Region,
-        pub via_version: bool,
-        pub bungee_cord: bool,
-        pub cracked: bool,
-        pub key: String
-    }
-
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    pub enum Region {
-        NA, // North America
-        EU, // Europe
-        AS, // Asia
-        AF, // Africa
-        OC, // Oceania
-        SA, // South America
-        AN // Antarctica WTF?
-    }
-    
     #[derive(Clone)]
     pub struct NodeManager {
         pub nodes: Vec<Node>
@@ -43,8 +18,19 @@ pub mod node_manager {
             self.nodes.push(node);
         }
 
-        pub fn get_node(&self, key: String) -> Option<&Node> {
-            self.nodes.iter().find(|x| x.key == key)
+        pub fn get_node(&mut self, key: String) -> Option<&mut Node> {
+            let index = match self.nodes.iter().position(|x| x.key == key) {
+                Some(id) => id,
+                None => {
+                    eprintln!("Failed to get node key dex ({})", key);
+                    return None
+                }
+            };
+
+            match self.nodes.get_mut(index) {
+                Some(node) => Some(node),
+                None => None
+            }
         }
     }
 }

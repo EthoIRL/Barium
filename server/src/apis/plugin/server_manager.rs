@@ -10,6 +10,7 @@ pub mod server_manager {
 
         use crate::anticheat::node_manager::node_manager::NodeManager;
         use crate::apis::plugin::packets::service::Service;
+        use crate::apis::plugin::packets::play::Play;
         use crate::apis::plugin::packets::packet::packet::to_packet;
         // use crate::node_manager::node_manager::Node;
 
@@ -31,8 +32,14 @@ pub mod server_manager {
                         let mut sending_packet: Option<Vec<u8>> = None;
                         
                         match received_packet.id as i8 {
-                            0..=5 => {
+                            // 0..8 (One through five)
+                            // 0 1 2 3 4 5 6 7 8
+                            0..=8 => {
                                 sending_packet = Service::handleServicePacket(received_packet, &node_manager);
+                            }
+                            // 10..30 (Ten through thirty)
+                            10..=30 => {
+                                sending_packet = Play::handlePlayPacket(received_packet, &node_manager);
                             }
                             _ => println!("Unknown packet received! ID: {}", received_packet.id)
                         }

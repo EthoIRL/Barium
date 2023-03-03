@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
+import me.etho.barium.Backend.Api.BariumApi;
 import me.etho.barium.Listeners.NetPacketListener;
 import me.etho.barium.Listeners.PlayerPacketListener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,9 @@ public final class Barium extends JavaPlugin {
 
     @Getter
     private static Barium instance;
+
+    @Getter
+    private static BariumApi api;
 
     @Getter
     private static final ExecutorService PacketExecutor = Executors.newSingleThreadExecutor();
@@ -39,8 +43,15 @@ public final class Barium extends JavaPlugin {
 
         PacketEvents.getAPI().init();
 
-        if (PacketEvents.getAPI().isInitialized())
+        if (PacketEvents.getAPI().isInitialized()) {
             getLogger().info("PacketEvents initialized & running " + PacketEvents.getAPI().getVersion().toString() + "!");
+            api = new BariumApi();
+
+            api.InitBackend();
+        } else {
+            getLogger().warning("PacketEvents failed to initialized " + PacketEvents.getAPI().getVersion().toString() + "!");
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
