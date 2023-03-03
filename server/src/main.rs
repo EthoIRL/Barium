@@ -16,10 +16,17 @@ pub mod anticheat {
 
 pub mod apis {
     pub mod plugin {
-        pub mod packets {
+        pub mod handlers {
             pub mod packet;
             pub mod service;
             pub mod play;
+
+            pub mod packets {
+                pub mod player_join_packet;
+                pub mod player_leave_packet;
+                pub mod node_register_packet;
+                pub mod node_unregister_packet;
+            }
         }
         pub mod server_manager;
     }

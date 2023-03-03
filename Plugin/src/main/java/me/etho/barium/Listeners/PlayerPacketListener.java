@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.event.UserLoginEvent;
 import me.etho.barium.Backend.Api.BariumApi;
 import me.etho.barium.Backend.Packets.Packet;
 import me.etho.barium.Backend.Packets.Play.PlayerJoin;
+import me.etho.barium.Backend.Packets.Play.PlayerLeave;
 import me.etho.barium.Backend.Packets.Service.NodeKey;
 import me.etho.barium.Backend.Utils.ApiUtils;
 import me.etho.barium.Barium;
@@ -42,5 +43,17 @@ public class PlayerPacketListener extends PacketListenerAbstract {
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
         Barium.getInstance().getLogger().info("user logged out " + event.getUser().getName());
+
+        if (event.getUser().getName() != null) {
+            PlayerLeave playerLeave = new PlayerLeave();
+            playerLeave.server_key = Barium.getApi().getServerKey();
+            playerLeave.username = event.getUser().getName();
+
+            try {
+                ApiUtils.SendPacket(11, playerLeave, BariumApi.getInstance().Connect());
+            } catch (IOException ex) {
+                Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
+            }
+        }
     }
 }

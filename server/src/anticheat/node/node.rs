@@ -52,25 +52,35 @@ impl Node {
         self.players.push(node_player);
     }
 
-    pub fn get_player(&mut self, username: String) -> NodePlayer {
-        todo!()
+    pub fn get_player(&mut self, username: String) -> Option<&mut NodePlayer> {
+        let index = match self.find_index(username) {
+            Some(id) => id,
+            None => return None
+        };
+
+        match self.players.get_mut(index) {
+            Some(player) => Some(player),
+            None => None,
+        }
     }
 
     pub fn player_exists(&mut self, username: String) -> bool {
-        todo!()
+        self.players.iter().any(|x| x.username == username)
     }
 
     pub fn remove_player(&mut self, username: String) {
-        let index = match self.players.iter().position(|x| x.username == username) {
+        let index = match self.find_index(username) {
             Some(id) => id,
-            None => {
-                eprintln!(
-                    "Failed to remove player from node player dex ({})",
-                    username
-                );
-                return;
-            }
+            None => return
         };
+
         self.players.remove(index);
+    }
+
+    fn find_index(&self, username: String) -> Option<usize> {
+        match self.players.iter().position(|x| x.username == username) {
+            Some(id) => Some(id),
+            None => None
+        }
     }
 }

@@ -7,8 +7,10 @@ import me.etho.barium.Backend.Packets.Service.NodeRegister;
 import me.etho.barium.Backend.Utils.ApiUtils;
 import me.etho.barium.Barium;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 public class BariumApi {
@@ -47,15 +49,12 @@ public class BariumApi {
         }
     }
 
-    public Socket Connect() {
-        try {
-            int serverPort = 8080;
-            InetAddress host = InetAddress.getByName("127.0.0.1");
-            return new Socket(host, serverPort);
-        } catch (Exception ex) {
-            Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
-        }
+    public Socket Connect() throws IOException {
+        int serverPort = 8080;
+        InetAddress host = InetAddress.getByName("127.0.0.1");
+        Socket socket = new Socket(host, serverPort);
+        socket.setSoTimeout(30000);
 
-        return null;
+        return socket;
     }
 }

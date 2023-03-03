@@ -8,9 +8,9 @@ pub mod server {
     use tokio::net::TcpStream;
 
     use crate::anticheat::node_manager::NodeManager;
-    use crate::apis::plugin::packets::packet::to_packet;
-    use crate::apis::plugin::packets::play;
-    use crate::apis::plugin::packets::service;
+    use crate::apis::plugin::handlers::packet::to_packet;
+    use crate::apis::plugin::handlers::play;
+    use crate::apis::plugin::handlers::service;
 
     use std::sync::{Arc, Mutex};
 

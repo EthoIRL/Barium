@@ -5,10 +5,14 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import me.etho.barium.Backend.Api.BariumApi;
+import me.etho.barium.Backend.Packets.Play.PlayerLeave;
+import me.etho.barium.Backend.Packets.Service.NodeUnregister;
+import me.etho.barium.Backend.Utils.ApiUtils;
 import me.etho.barium.Listeners.NetPacketListener;
 import me.etho.barium.Listeners.PlayerPacketListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,5 +61,14 @@ public final class Barium extends JavaPlugin {
     @Override
     public void onDisable() {
         PacketEvents.getAPI().terminate();
+
+        NodeUnregister nodeUnregister = new NodeUnregister();
+        nodeUnregister.key = Barium.getApi().getServerKey();
+
+        try {
+            ApiUtils.SendPacket(1, nodeUnregister, BariumApi.getInstance().Connect());
+        } catch (IOException ex) {
+            Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
+        }
     }
 }
