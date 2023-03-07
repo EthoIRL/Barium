@@ -8,9 +8,8 @@ pub struct Node {
     pub server_ip: String,
     pub server_version: String,
     pub server_region: Region,
+    pub server_os: String,
     pub via_version: bool,
-    pub bungee_cord: bool,
-    pub cracked: bool,
     pub key: String,
     pub players: Vec<NodePlayer>,
 }
@@ -31,18 +30,16 @@ impl Node {
         server_ip: String,
         server_version: String,
         server_region: Region,
+        server_os: String,
         via_version: bool,
-        bungee_cord: bool,
-        cracked: bool,
         key: String,
     ) -> Self {
         Node {
             server_ip: server_ip,
             server_version: server_version,
             server_region: server_region,
+            server_os: server_os,
             via_version: via_version,
-            bungee_cord: bungee_cord,
-            cracked: cracked,
             key: key,
             players: Vec::new(),
         }

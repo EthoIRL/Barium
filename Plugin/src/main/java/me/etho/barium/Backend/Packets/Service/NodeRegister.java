@@ -4,9 +4,8 @@ public class NodeRegister {
     public String server_ip;
     public String server_version;
     public Region server_region;
+    public String server_os;
     public boolean via_version;
-    public boolean bungee_cord;
-    public boolean cracked;
 
     public enum Region {
         NA, // North America

@@ -32,7 +32,7 @@ public class PlayerPacketListener extends PacketListenerAbstract {
             playerJoin.version = event.getUser().getClientVersion().toString();
 
             try {
-                ApiUtils.SendPacket(10, playerJoin, BariumApi.getInstance().Connect());
+                ApiUtils.SendPacket(10, playerJoin, BariumApi.getInstance().getConnection());
             } catch (IOException ex) {
                 Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
             }
@@ -50,7 +50,7 @@ public class PlayerPacketListener extends PacketListenerAbstract {
             playerLeave.username = event.getUser().getName();
 
             try {
-                ApiUtils.SendPacket(11, playerLeave, BariumApi.getInstance().Connect());
+                ApiUtils.SendPacket(11, playerLeave, BariumApi.getInstance().getConnection());
             } catch (IOException ex) {
                 Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
             }

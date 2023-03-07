@@ -16,9 +16,8 @@ pub struct NodeRegister {
     pub server_ip: String,
     pub server_version: String,
     pub server_region: Region,
+    pub server_os: String,
     pub via_version: bool,
-    pub bungee_cord: bool,
-    pub cracked: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -26,7 +25,10 @@ pub struct NodeKey {
     pub key: String,
 }
 
-pub fn handle_node_register(packet_data: String, mut node_manager: MutexGuard<NodeManager>) -> Option<Vec<u8>> {
+pub fn handle_node_register(
+    packet_data: String,
+    mut node_manager: MutexGuard<NodeManager>,
+) -> Option<Vec<u8>> {
     let node_register: NodeRegister = match serde_json::from_str(&packet_data) {
         Ok(result) => result,
         Err(_) => return None,
@@ -40,9 +42,8 @@ pub fn handle_node_register(packet_data: String, mut node_manager: MutexGuard<No
         node_register.server_ip.clone(),
         node_register.server_version.clone(),
         node_register.server_region.clone(),
+        node_register.server_os.clone(),
         node_register.via_version.clone(),
-        node_register.bungee_cord.clone(),
-        node_register.cracked.clone(),
         key,
     );
     node_manager.add_node(node);

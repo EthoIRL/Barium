@@ -26,6 +26,8 @@ pub mod apis {
                 pub mod player_leave_packet;
                 pub mod node_register_packet;
                 pub mod node_unregister_packet;
+                
+                pub mod player_movement_packet;
             }
         }
         pub mod server_manager;

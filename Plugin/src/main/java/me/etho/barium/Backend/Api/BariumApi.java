@@ -21,40 +21,43 @@ public class BariumApi {
     @Getter
     public String ServerKey = null;
 
+    public Socket connection = null;
+
     public BariumApi() {
         instance = this;
     }
 
-    public void InitBackend() {
+    public void InitBackend(String serverVersion, String serverOS, boolean ViaVersion) {
         try {
-            int serverPort = 8080;
-            InetAddress host = InetAddress.getByName("127.0.0.1");
-            Socket remoteSocket = new Socket(host, serverPort);
-
             NodeRegister register = new NodeRegister();
-            register.server_ip = "127.0.0.1";
-            register.server_version = "1.8.9";
+            register.server_ip = "****";
+            register.server_version = serverVersion;
             register.server_region = NodeRegister.Region.NA;
-            register.via_version = true;
-            register.bungee_cord = false;
-            register.cracked = false;
-            Packet<NodeKey> nodekey = ApiUtils.SendAndReceivePacket(0, register, NodeKey.class, remoteSocket);
+            register.server_os = serverOS;
+            register.via_version = ViaVersion;
+            Packet<NodeKey> nodekey = ApiUtils.SendAndReceivePacket(0, register, NodeKey.class, getConnection());
             Barium.getInstance().getLogger().info("KEY: " + nodekey.getPacket().key + " ID: " + nodekey.getId());
 
             ServerKey = nodekey.getPacket().key;
-//            Packet packet = ApiUtils.SendPacketAndReceive(0, register, remoteSocket);
-//            Barium.getInstance().getLogger().info(new String(packet.getData(), StandardCharsets.UTF_8));
         } catch (Exception ex) {
             Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
         }
     }
 
-    public Socket Connect() throws IOException {
+    public void Connect() throws IOException {
         int serverPort = 8080;
         InetAddress host = InetAddress.getByName("127.0.0.1");
         Socket socket = new Socket(host, serverPort);
         socket.setSoTimeout(30000);
 
-        return socket;
+        connection = socket;
+    }
+
+    public Socket getConnection() throws IOException {
+        if (connection == null) {
+            Connect();
+        }
+
+        return connection;
     }
 }

@@ -2,6 +2,7 @@ package me.etho.barium;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.manager.server.ServerManager;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import me.etho.barium.Backend.Api.BariumApi;
@@ -51,7 +52,10 @@ public final class Barium extends JavaPlugin {
             getLogger().info("PacketEvents initialized & running " + PacketEvents.getAPI().getVersion().toString() + "!");
             api = new BariumApi();
 
-            api.InitBackend();
+            ServerManager ServerManager = PacketEvents.getAPI().getServerManager();
+            boolean ViaVersion = getServer().getPluginManager().getPlugin("ViaVersion") != null;
+
+            api.InitBackend(ServerManager.getVersion().toString(), ServerManager.getOS().toString(), ViaVersion);
         } else {
             getLogger().warning("PacketEvents failed to initialized " + PacketEvents.getAPI().getVersion().toString() + "!");
             getServer().getPluginManager().disablePlugin(this);
@@ -66,7 +70,11 @@ public final class Barium extends JavaPlugin {
         nodeUnregister.key = Barium.getApi().getServerKey();
 
         try {
-            ApiUtils.SendPacket(1, nodeUnregister, BariumApi.getInstance().Connect());
+            ApiUtils.SendPacket(1, nodeUnregister, BariumApi.getInstance().getConnection());
+
+            if (BariumApi.getInstance().connection != null) {
+                BariumApi.getInstance().connection.close();
+            }
         } catch (IOException ex) {
             Barium.getInstance().getLogger().warning("Barium API Exception: " + ex);
         }

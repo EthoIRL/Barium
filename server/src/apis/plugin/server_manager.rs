@@ -8,7 +8,7 @@ pub mod server {
     use tokio::net::TcpStream;
 
     use crate::anticheat::node_manager::NodeManager;
-    use crate::apis::plugin::handlers::packet::to_packet;
+    use crate::apis::plugin::handlers::packet::{to_packet, to_string};
     use crate::apis::plugin::handlers::play;
     use crate::apis::plugin::handlers::service;
 
@@ -38,7 +38,18 @@ pub mod server {
                         10..=30 => {
                             sending_packet = play::handle_play_packet(received_packet, &node_manager);
                         }
-                        _ => println!("Unknown packet received! ID: {}", received_packet.id),
+                        _ => {
+                            let id = received_packet.id;
+                            let packet_data: String = match to_string(received_packet) {
+                                Some(data) => data,
+                                None => {
+                                    panic!("No string data found in packet!")
+                                }
+                            };
+
+                            println!("Unknown packet received! ID: {}", id);
+                            println!("Attempting Decode: ({})", packet_data)
+                        },
                     }
 
                     if let Some(data) = &sending_packet {
@@ -46,7 +57,7 @@ pub mod server {
                             eprintln!("failed to write to socket; err = {:?}", e);
                         }
                     }
-                    buf = [0; 1024];
+                    drop(buf);
                     drop(sending_packet);
                 }
                 Err(e) => {

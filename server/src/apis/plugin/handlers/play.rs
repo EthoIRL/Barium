@@ -7,6 +7,7 @@ use crate::apis::plugin::handlers::packet::to_string;
 
 use super::packets::player_join_packet;
 use super::packets::player_leave_packet;
+use super::packets::player_movement_packet;
 
 pub fn handle_play_packet(
     packet: Packet,
@@ -31,7 +32,10 @@ pub fn handle_play_packet(
         },
         11 => {
             player_leave_packet::handle_player_leave(packet_data, node_manager);
-        }
+        },
+        12 => {
+            player_movement_packet::handle_player_movement(packet_data, node_manager);
+        },
         _ => todo!(),
     }
 
