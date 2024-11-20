@@ -2,6 +2,7 @@
 MCJE 1.8 - 1.21 remote based anti cheat solution based in Rust
 
 ## Architecture
+![image](https://github.com/user-attachments/assets/b51ba19a-cb5c-4e7b-8876-4aa73d6a3690)
 
 ## Stack
 #### MCJE Plugin:
