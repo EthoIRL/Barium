@@ -1,11 +1,12 @@
 name: Barium
-version: '${project.version}'
-main: me.etho.barium.Barium
-api-version: 1.19
+version: '1.0-SNAPSHOT'
+main: tech.strateim.barium.Barium
+api-version: '1.21'
+prefix: BAR
 load: STARTUP
 authors: [ Etho ]
-description: Remote based java minecraft anti cheat
-
+description: Experimental remote based anticheat
+website: https://strateim.tech/
 softdepend:
   - ProtocolLib
   - ProtocolSupport
