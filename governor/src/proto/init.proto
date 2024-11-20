@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package init;
+
+option java_multiple_files = true;
+
+message Register {
+  int32 PluginVersion = 1;
+  int32 ServerVersion = 2;
+  Os Os = 3;
+  Protocol Protocol = 4;
+  string IpAddress = 5;
+}
+
+enum Os {
+  Linux = 0;
+  Windows = 1;
+  MacOS = 2;
+  Other = 3;
+}
+
+message Protocol {
+  bool ViaVersion = 1;
+  bool ViaBackwards = 2;
+  bool ViaRewind = 3;
+  bool Geyser = 4;
+}
