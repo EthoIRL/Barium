@@ -98,7 +98,7 @@ public class Remote {
         while(true) {
             try {
                 synchronized (SocketReceive) {
-                    SocketReceive.wait();
+                    SocketReceive.wait(1);
 
                     switch (State) {
                         case Init -> {
