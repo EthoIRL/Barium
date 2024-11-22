@@ -1,8 +1,9 @@
-use std::io::Read;
+use std::io::{Read, Write};
 use prost::Message;
+use uuid::Uuid;
 use crate::API_VERSION;
-use crate::proto::Register;
-use crate::state::client::{Client, MAXIMUM_PACKET_SIZE};
+use crate::proto::{Register, RegistrationResponse};
+use crate::state::client::{Client, MAXIMUM_PACKET_SIZE, Status};
 
 #[derive(Debug)]
 pub enum RegistrationError {
@@ -45,4 +46,25 @@ pub fn handle_registration(client: &mut Client, data_length_buffer: &mut [u8; 4]
     }
 
     Err(RegistrationError::Unknown)
+}
+
+pub fn handle_response(client: &mut Client) {
+    let mut response = RegistrationResponse {
+        succeeded: client.status == Status::Registered,
+        uuid_key: None
+    };
+    
+    let key = Uuid::new_v4();
+    client.key = Some(key);
+    response.uuid_key = Some(key.to_string());
+    
+    let data_buffer: Vec<u8> = response.encode_to_vec();
+
+    let data_length: [u8; 4] = u32::to_le_bytes(data_buffer.len() as u32);
+    let packet_id: [u8; 2] = u16::to_le_bytes(1);
+
+    client.stream.write_all(&data_length).unwrap();
+    client.stream.write_all(&packet_id).unwrap();
+    client.stream.write_all(&data_buffer).unwrap();
+    client.stream.flush().unwrap();
 }

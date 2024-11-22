@@ -23,7 +23,8 @@ pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<ThreadPool>, Error
                 let client = Client {
                     stream: tcp_stream,
                     status: Status::Init,
-                    state: None
+                    state: None,
+                    key: None
                 };
 
                 pool.execute(|| client::handle_client(client));
