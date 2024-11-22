@@ -3,10 +3,17 @@ package tech.strateim.barium.Master;
 import init.Os;
 import init.Protocol;
 import init.Register;
+import init.RegistrationResponse;
 import org.bukkit.Server;
+import tech.strateim.barium.Master.Enum.Status;
+import tech.strateim.barium.Master.State.PacketHandler;
 
+import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -84,5 +91,45 @@ public class Remote {
                 .build();
 
         PacketHandler.SendPacket(register, 0);
+    }
+
+
+    private void StartGovernorReceiver() {
+        while(true) {
+            try {
+                synchronized (SocketReceive) {
+                    SocketReceive.wait();
+
+                    switch (State) {
+                        case Init -> {
+                            RegistrationResponse response = (RegistrationResponse) PacketHandler.ReceivePacketBlocking(RegistrationResponse.getDefaultInstance(), 1);
+
+                            if (response == null) {
+                                continue;
+                            }
+
+                            if (response.getSucceeded()) {
+                                Log.info(response.toString());
+
+                                State = Status.Ready;
+                                continue;
+                            }
+
+                            Log.severe("Failed to authenticate, registration failed");
+                            Log.info(response.toString());
+
+                            State = Status.Shutdown;
+
+                            break;
+                        }
+                        case null, default -> {
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                Log.severe("ERROR " + ex.toString());
+            }
+        }
     }
 }
