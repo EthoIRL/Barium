@@ -25,3 +25,8 @@ message Protocol {
   bool ViaRewind = 3;
   bool Geyser = 4;
 }
+
+message RegistrationResponse {
+  bool Succeeded = 1;
+  optional string UuidKey = 2;
+}
