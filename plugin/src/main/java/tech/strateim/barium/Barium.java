@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.strateim.barium.Master.Remote;
+import tech.strateim.barium.Master.State.PacketHandler;
 
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ public final class Barium extends JavaPlugin {
 
     public Server Server;
     public Remote Remote;
+    public PacketHandler PacketHandler;
 
     @Override
     public void onLoad() {
@@ -31,7 +33,7 @@ public final class Barium extends JavaPlugin {
 
         instance = PacketEvents.getAPI();
 
-        Remote.ExecutorService.execute(() -> Remote.Start("127.0.0.1", 3238, Server));
+        Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server));
 
         PacketEventsSettings settings = instance.getSettings();
         settings.checkForUpdates(false).debug(true).timeStampMode(TimeStampMode.NANO);

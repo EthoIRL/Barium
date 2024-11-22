@@ -16,14 +16,17 @@ public class Remote {
     private static Logger Log;
     private Socket Socket;
     private OutputStream SocketOutput;
+    private InputStream SocketReceive;
     public final ExecutorService ExecutorService = Executors.newFixedThreadPool(8);
     public Status State = Status.Init;
+
+    private PacketHandler PacketHandler;
 
     public Remote(Logger log) {
         Log = log;
     }
 
-    public void Start(String governorAddress, int governorPort, Server localServer) {
+    public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer) {
         while (true) {
             try {
                 Socket = new Socket(governorAddress, governorPort);
@@ -42,13 +45,27 @@ public class Remote {
         try {
             SocketOutput = Socket.getOutputStream();
         } catch (Exception ex) {
-            Log.log(Level.SEVERE, "Failed to get socket stream to governor server");
+            Log.log(Level.SEVERE, "Failed to get sender socket stream to governor server");
             State = Status.Crash;
 
-            return;
+            return null;
         }
 
+        try {
+            SocketReceive = Socket.getInputStream();
+        } catch (Exception ex) {
+            Log.log(Level.SEVERE, "Failed to get receiver socket stream to governor server");
+            State = Status.Crash;
+
+            return null;
+        }
+
+        PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
+
+        ExecutorService.execute(this::StartGovernorReceiver);
         ExecutorService.execute(() -> InitRegister(localServer));
+
+        return PacketHandler;
     }
 
     private void InitRegister(Server localServer) {
@@ -66,6 +83,6 @@ public class Remote {
                 .setIpAddress("lol idk")
                 .build();
 
-        Packet.SendPacket(register, 0, SocketOutput, Log);
+        PacketHandler.SendPacket(register, 0);
     }
 }
