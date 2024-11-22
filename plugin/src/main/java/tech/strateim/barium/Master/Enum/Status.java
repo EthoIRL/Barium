@@ -1,4 +1,4 @@
-package tech.strateim.barium.Master;
+package tech.strateim.barium.Master.Enum;
 
 public enum Status {
     Init,
