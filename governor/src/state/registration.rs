@@ -60,11 +60,11 @@ pub fn handle_response(client: &mut Client) {
     
     let data_buffer: Vec<u8> = response.encode_to_vec();
 
-    let data_length: [u8; 4] = u32::to_le_bytes(data_buffer.len() as u32);
     let packet_id: [u8; 2] = u16::to_le_bytes(1);
+    let data_length: [u8; 4] = u32::to_le_bytes(data_buffer.len() as u32);
 
-    client.stream.write_all(&data_length).unwrap();
     client.stream.write_all(&packet_id).unwrap();
+    client.stream.write_all(&data_length).unwrap();
     client.stream.write_all(&data_buffer).unwrap();
     client.stream.flush().unwrap();
 }
