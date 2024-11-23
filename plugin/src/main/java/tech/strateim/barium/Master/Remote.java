@@ -1,20 +1,14 @@
 package tech.strateim.barium.Master;
 
-import init.Os;
-import init.Protocol;
-import init.Register;
-import init.RegistrationResponse;
+import com.github.retrooper.packetevents.PacketEventsAPI;
 import org.bukkit.Server;
-import tech.strateim.barium.Master.Enum.Status;
-import tech.strateim.barium.Master.State.PacketHandler;
-import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
+import tech.strateim.barium.Master.Packet.PacketHandler;
+import tech.strateim.barium.Master.State.StateHandler;
 
 import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -26,15 +20,14 @@ public class Remote {
     private OutputStream SocketOutput;
     private InputStream SocketReceive;
     public final ExecutorService ExecutorService = Executors.newFixedThreadPool(8);
-    public Status State = Status.Init;
-
     private PacketHandler PacketHandler;
+    private StateHandler StateHandler;
 
     public Remote(Logger log) {
         Log = log;
     }
 
-    public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer) {
+    public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer, PacketEventsAPI<?> packetEvents) {
         while (true) {
             try {
                 Socket = new Socket(governorAddress, governorPort);
@@ -54,7 +47,6 @@ public class Remote {
             SocketOutput = Socket.getOutputStream();
         } catch (Exception ex) {
             Log.log(Level.SEVERE, "Failed to get sender socket stream to governor server");
-            State = Status.Crash;
 
             return null;
         }
@@ -63,15 +55,15 @@ public class Remote {
             SocketReceive = Socket.getInputStream();
         } catch (Exception ex) {
             Log.log(Level.SEVERE, "Failed to get receiver socket stream to governor server");
-            State = Status.Crash;
 
             return null;
         }
 
         PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
+        StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log);
 
-        ExecutorService.execute(this::StartGovernorReceiver);
-        ExecutorService.execute(() -> InitRegister(localServer, packetEvents));
+        ExecutorService.execute(StateHandler::StartReceiver);
+        ExecutorService.execute(() -> StateHandler.RegistrationHandler.InitRegister(localServer, packetEvents));
 
         return PacketHandler;
     }
