@@ -7,6 +7,7 @@ import init.RegistrationResponse;
 import org.bukkit.Server;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.State.PacketHandler;
+import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
 
 import javax.annotation.Nullable;
 import java.io.InputStream;
@@ -70,22 +71,26 @@ public class Remote {
         PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
 
         ExecutorService.execute(this::StartGovernorReceiver);
-        ExecutorService.execute(() -> InitRegister(localServer));
+        ExecutorService.execute(() -> InitRegister(localServer, packetEvents));
 
         return PacketHandler;
     }
 
-    private void InitRegister(Server localServer) {
+    private void InitRegister(Server localServer, PacketEventsAPI<?> packetEvents) {
+        ServerManager serverManager = packetEvents.getServerManager();
+        Os system = PacketEventsConversion.SystemConversion(serverManager.getOS());
+        PluginManager pluginManager = localServer.getPluginManager();
+
         Protocol.Builder protocolBuilder = Protocol.newBuilder()
-                .setGeyser(false)
-                .setViaBackwards(false)
-                .setViaRewind(false)
-                .setViaVersion(false);
+                .setGeyser(pluginManager.isPluginEnabled("Geyser-Spigot"))
+                .setViaBackwards(pluginManager.isPluginEnabled("ViaBackwards"))
+                .setViaRewind(pluginManager.isPluginEnabled("ViaRewind"))
+                .setViaVersion(pluginManager.isPluginEnabled("ViaVersion"));
 
         Register register = Register.newBuilder()
                 .setPluginVersion(0)
-                .setServerVersion(134)
-                .setOs(Os.Windows)
+                .setServerVersion(serverManager.getVersion().getProtocolVersion())
+                .setOs(system)
                 .setProtocol(protocolBuilder)
                 .build();
 

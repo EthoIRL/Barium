@@ -8,14 +8,14 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.strateim.barium.Master.Remote;
-import tech.strateim.barium.Master.State.PacketHandler;
+import tech.strateim.barium.Master.Packet.PacketHandler;
 
 import java.util.logging.Logger;
 
 public final class Barium extends JavaPlugin {
 
     public Logger Log;
-    public PacketEventsAPI instance;
+    public PacketEventsAPI<?> PeApi;
 
     public Server Server;
     public Remote Remote;
@@ -31,11 +31,11 @@ public final class Barium extends JavaPlugin {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
 
-        instance = PacketEvents.getAPI();
+        PeApi = PacketEvents.getAPI();
 
-        Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server));
+        Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server, PeApi));
 
-        PacketEventsSettings settings = instance.getSettings();
+        PacketEventsSettings settings = PeApi.getSettings();
         settings.checkForUpdates(false).debug(true).timeStampMode(TimeStampMode.NANO);
     }
 
