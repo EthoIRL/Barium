@@ -114,4 +114,8 @@ public class PacketHandler {
 
         return null;
     }
+
+    public <T extends GeneratedMessageV3> @Nullable GeneratedMessageV3 SerializePacket(T packetType, Packet packet) throws Exception {
+        return packetType.getParserForType().parseFrom(packet.data());
+    }
 }
