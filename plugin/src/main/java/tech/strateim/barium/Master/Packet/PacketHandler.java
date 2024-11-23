@@ -1,4 +1,4 @@
-package tech.strateim.barium.Master.State;
+package tech.strateim.barium.Master.Packet;
 
 import com.google.protobuf.GeneratedMessageV3;
 import org.jetbrains.annotations.Nullable;
@@ -92,14 +92,14 @@ public class PacketHandler {
         }
     }
 
-    public <T extends GeneratedMessageV3> @Nullable GeneratedMessageV3 ReceivePacketBlocking(T packetType, int id) throws Exception {
-        ByteBuffer lengthBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
+    public @Nullable Packet ReceivePacketBlocking() throws Exception {
         ByteBuffer packetBuffer = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer lengthBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
 
-        byte[] dataLengthArray = lengthBuffer.array();
         byte[] packetIdArray = packetBuffer.array();
+        byte[] dataLengthArray = lengthBuffer.array();
 
-        if (ReceiveSocket.read(dataLengthArray) != -1 && ReceiveSocket.read(packetIdArray) != -1) {
+        if (ReceiveSocket.read(packetIdArray) != -1 && ReceiveSocket.read(dataLengthArray) != -1) {
             int dataLength = lengthBuffer.getInt();
             byte[] data = new byte[dataLength];
 
@@ -109,7 +109,7 @@ public class PacketHandler {
                 throw new Exception("Data length does not match. (Length: " + dataLength + " Interpreted: " + dataRead + ")");
             }
 
-            return packetType.getParserForType().parseFrom(data);
+            return new Packet(data, packetBuffer.getShort());
         }
 
         return null;
