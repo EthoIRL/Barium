@@ -87,7 +87,6 @@ public class Remote {
                 .setServerVersion(134)
                 .setOs(Os.Windows)
                 .setProtocol(protocolBuilder)
-                .setIpAddress("lol idk")
                 .build();
 
         PacketHandler.SendPacket(register, 0);

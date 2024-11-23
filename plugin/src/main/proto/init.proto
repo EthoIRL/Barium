@@ -9,7 +9,6 @@ message Register {
   int32 ServerVersion = 2;
   Os Os = 3;
   Protocol Protocol = 4;
-  string IpAddress = 5;
 }
 
 enum Os {
