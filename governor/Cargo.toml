@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-threadpool = "1.8.1"
 strum = { version = "0.26.3", features = ["derive"] }
 prost = "0.13.3"
 uuid = { version = "1.11.0", features = ["v4"] }

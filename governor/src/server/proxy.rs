@@ -1,18 +1,16 @@
-use std::{thread, u16, u32};
-use std::io::{Error, Read};
-use std::net::{TcpListener, TcpStream};
-use std::sync::Arc;
+use std::{thread, u16};
+use std::io::Error;
+use std::net::TcpListener;
+use std::sync::{Arc, Mutex};
+use std::thread::JoinHandle;
 
-use threadpool::ThreadPool;
 use crate::state::client;
 use crate::state::client::{Client, Status};
 
-pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<ThreadPool>, Error> {
+pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
     let listener = TcpListener::bind(address).unwrap();
 
-    // TODO: Create unit tests for tons of clients
-
-    let thread_pool = Arc::new(ThreadPool::new(8));
+    let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
     let pool = thread_pool.clone();
 
     thread::spawn(move || {
@@ -27,7 +25,9 @@ pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<ThreadPool>, Error
                     key: None
                 };
 
-                pool.execute(|| client::handle_client(client));
+                if let Ok(mut pool) = pool.lock() {
+                    pool.push(thread::spawn(|| client::handle_client(client)));
+                }
             }
         }
     }); 
