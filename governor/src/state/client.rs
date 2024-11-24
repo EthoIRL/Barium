@@ -1,6 +1,7 @@
 use std::cmp::PartialEq;
-use std::io::Write;
 use std::net::TcpStream;
+use std::thread;
+use std::time::Duration;
 use uuid::Uuid;
 
 use crate::proto::Register;
@@ -28,22 +29,32 @@ pub fn handle_client(mut client: Client) {
     loop {
         match &client.status {
             Status::Init => {
-                match registration::handle_registration(&mut client, &mut data_length_buffer) {
+                let authenticated = match registration::handle_registration(&mut client, &mut data_length_buffer) {
                     Ok(state) => {
                         client.state = Some(state);
-                        client.status = Status::Registered;
+                        true
                     },
                     Err(err) => {
                         println!("[GOV] Failed to handle registration, ({:#?})", err);
-                        break;
+                        false
+                    }
+                };
+
+                println!("Authenticated: {authenticated}");
+
+                match registration::handle_response(&mut client, authenticated) {
+                    Ok(_) => {
+                        client.status = Status::Registered;
+                        println!("{:#?}", client.state.unwrap());
+                    }
+                    Err(_) => {
+                        return;
                     }
                 }
-
-                registration::handle_response(&mut client);
             },
             _ => {
-                println!("{:#?}", client.state.unwrap());
-                break;
+                thread::sleep(Duration::from_millis(1));
+                continue;
             }
         }
 
