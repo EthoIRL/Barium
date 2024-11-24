@@ -7,6 +7,7 @@ import tech.strateim.barium.Master.State.Registration.RegistrationHandler;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.logging.Logger;
 
 public class StateHandler {
@@ -49,8 +50,12 @@ public class StateHandler {
                     }
 
                 } catch (Exception ex) {
-                    Log.severe("Failed to receive data from remote governor");
-                    Log.severe(ex.toString());
+                    if (ex instanceof SocketException) {
+                        State = Status.Crash;
+                        Log.severe("Socket connection to governor lost");
+
+                        return;
+                    }
                 }
             }
         }

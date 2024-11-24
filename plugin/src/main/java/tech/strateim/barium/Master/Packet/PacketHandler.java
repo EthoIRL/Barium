@@ -13,17 +13,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class PacketHandler {
-
     private final Logger Log;
-
     private final OutputStream SendSocket;
     private final Lock SendLock;
     private final InputStream ReceiveSocket;
-
     private final byte MAX_RETRIES = 4;
-    private final boolean DEBUG = true;
     private final int PACKET_WAIT = 500;
-
 
     public PacketHandler(Logger log, OutputStream sender, InputStream receiver) {
         Log = log;
@@ -44,10 +39,6 @@ public class PacketHandler {
             try {
                 Thread.sleep(1000);
             } catch (Exception ignored) {}
-
-            if (DEBUG) {
-                Log.warning("Packet failed to send retrying... [" + id + "]");
-            }
 
             SendPacketRetry(dataLength, packetId, data);
         }

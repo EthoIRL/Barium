@@ -13,7 +13,6 @@ import tech.strateim.barium.Master.Packet.PacketHandler;
 import java.util.logging.Logger;
 
 public final class Barium extends JavaPlugin {
-
     public Logger Log;
     public PacketEventsAPI<?> PeApi;
 
