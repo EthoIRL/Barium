@@ -60,6 +60,7 @@ public class RegistrationHandler {
                 Log.info(response.toString());
 
                 StateHandler.State = Status.Registered;
+                StateHandler.Key = response.getUuidKey();
 
                 return;
             }

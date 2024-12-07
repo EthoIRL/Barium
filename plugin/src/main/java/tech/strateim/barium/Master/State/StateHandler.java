@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 public class StateHandler {
     public Status State = Status.Initialization;
+    public String Key = null;
     private final PacketHandler PacketHandler;
     private final Logger Log;
     private final OutputStream SocketOutput;
