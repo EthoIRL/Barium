@@ -5,7 +5,7 @@ use std::time::Duration;
 use uuid::Uuid;
 
 use crate::proto::Register;
-use crate::state::registration;
+use crate::state::{packet, registration};
 
 pub const MAXIMUM_PACKET_SIZE: u32 = 2048;
 
@@ -24,14 +24,28 @@ pub enum Status {
 }
 
 pub fn handle_client(mut client: Client) {
+    let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
-
     loop {
+        let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
+            Ok(data) => {
+                data
+            },
+            Err(err) => {
+                println!("[GOV] Failed to get packet, ({:#?})", err);
+                return;
+            }
+        };
+
         match &client.status {
             Status::Init => {
-                let authenticated = match registration::handle_registration(&mut client, &mut data_length_buffer) {
-                    Ok(state) => {
-                        client.state = Some(state);
+                if packet.0 != 0 {
+                    println!("Unknown packet received during init phase");
+                    return;
+                }
+
+                let authenticated = match registration::handle_registration(&mut client, packet.1) {
+                    Ok(_) => {
                         true
                     },
                     Err(err) => {
