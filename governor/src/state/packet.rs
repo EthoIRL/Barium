@@ -17,7 +17,12 @@ pub fn send_packet(packet: impl Message, packet_id: u16, stream: &mut TcpStream)
     Ok(())
 }
 
-pub fn get_packet(stream: &mut TcpStream, packet_id_buffer: &mut [u8; 2], data_length_buffer: &mut [u8; 4]) -> Result<(u16, Vec<u8>), Error> {
+pub struct GenericPacket {
+    pub id: u16,
+    pub data: Vec<u8>
+}
+
+pub fn get_packet(stream: &mut TcpStream, packet_id_buffer: &mut [u8; 2], data_length_buffer: &mut [u8; 4]) -> Result<GenericPacket, Error> {
     stream.read_exact(packet_id_buffer)?;
     let packet_id = u16::from_le_bytes(*packet_id_buffer);
 
@@ -27,5 +32,8 @@ pub fn get_packet(stream: &mut TcpStream, packet_id_buffer: &mut [u8; 2], data_l
     let mut buffer = vec![0u8; data_length as usize];
     stream.read_exact(&mut buffer)?;
 
-    Ok((packet_id, buffer))
+    Ok(GenericPacket {
+        id: packet_id,
+        data: buffer
+    })
 }

@@ -28,9 +28,7 @@ pub fn handle_client(mut client: Client) {
     let mut data_length_buffer = [0u8; 4];
     loop {
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
-            Ok(data) => {
-                data
-            },
+            Ok(data) => data,
             Err(err) => {
                 println!("[GOV] Failed to get packet, ({:#?})", err);
                 return;
@@ -39,12 +37,12 @@ pub fn handle_client(mut client: Client) {
 
         match &client.status {
             Status::Initialization => {
-                if packet.0 != 0 {
+                if packet.id != 0 {
                     println!("Unknown packet received during init phase");
                     return;
                 }
 
-                let authenticated = match registration::handle_registration(&mut client, packet.1) {
+                let authenticated = match registration::handle_registration(&mut client, packet.data) {
                     Ok(_) => {
                         true
                     },
