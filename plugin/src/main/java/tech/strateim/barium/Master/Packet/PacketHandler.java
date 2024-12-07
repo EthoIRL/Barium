@@ -30,27 +30,27 @@ public class PacketHandler {
 
     public void SendPacket(GeneratedMessageV3 packet, int id) {
         byte[] data = packet.toByteArray();
-        byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
         byte[] packetId = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)id).array();
+        byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
 
         try {
-            WritePacketBlocking(dataLength, packetId, data);
+            WritePacketBlocking(packetId, dataLength, data);
         } catch (Exception ex) {
             try {
                 Thread.sleep(1000);
             } catch (Exception ignored) {}
 
-            SendPacketRetry(dataLength, packetId, data);
+            SendPacketRetry(packetId, dataLength, data);
         }
     }
 
 
-    private void SendPacketRetry(byte[] dataLength, byte[] packetId, byte[] data) {
+    private void SendPacketRetry(byte[] packetId, byte[] dataLength, byte[] data) {
         byte recursed = 0;
 
         while(true) {
             try {
-                WritePacketBlocking(dataLength, packetId, data);
+                WritePacketBlocking(packetId, dataLength, data);
             } catch (Exception ex) {
                 try {
                     Thread.sleep(PACKET_WAIT);
@@ -71,11 +71,11 @@ public class PacketHandler {
         }
     }
 
-    private void WritePacketBlocking(byte[] dataLength, byte[] packetId, byte[] data) throws IOException {
+    private void WritePacketBlocking(byte[] packetId, byte[] dataLength, byte[] data) throws IOException {
         try {
             SendLock.lock();
-            SendSocket.write(dataLength);
             SendSocket.write(packetId);
+            SendSocket.write(dataLength);
             SendSocket.write(data);
             SendSocket.flush();
         } finally {
