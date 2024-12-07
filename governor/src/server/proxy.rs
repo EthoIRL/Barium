@@ -20,7 +20,7 @@ pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHand
 
                 let client = Client {
                     stream: tcp_stream,
-                    status: Status::Init,
+                    status: Status::Initialization,
                     state: None,
                     key: None
                 };

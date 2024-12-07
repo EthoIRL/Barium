@@ -59,7 +59,7 @@ public class RegistrationHandler {
             if (response.getSucceeded()) {
                 Log.info(response.toString());
 
-                StateHandler.State = Status.Ready;
+                StateHandler.State = Status.Registered;
 
                 return;
             }
@@ -67,7 +67,7 @@ public class RegistrationHandler {
             Log.severe("Failed to authenticate, registration failed");
             Log.info(response.toString());
 
-            StateHandler.State = Status.Shutdown;
+            StateHandler.State = Status.Crash;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -11,7 +11,7 @@ import java.net.SocketException;
 import java.util.logging.Logger;
 
 public class StateHandler {
-    public Status State = Status.Init;
+    public Status State = Status.Initialization;
     private final PacketHandler PacketHandler;
     private final Logger Log;
     private final OutputStream SocketOutput;

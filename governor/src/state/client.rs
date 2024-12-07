@@ -18,9 +18,9 @@ pub struct Client {
 
 #[derive(PartialEq)]
 pub enum Status {
-    Init,
+    Initialization,
     Registered,
-    Error
+    Crash
 }
 
 pub fn handle_client(mut client: Client) {
@@ -38,7 +38,7 @@ pub fn handle_client(mut client: Client) {
         };
 
         match &client.status {
-            Status::Init => {
+            Status::Initialization => {
                 if packet.0 != 0 {
                     println!("Unknown packet received during init phase");
                     return;
@@ -71,6 +71,5 @@ pub fn handle_client(mut client: Client) {
                 continue;
             }
         }
-
     }
 }
