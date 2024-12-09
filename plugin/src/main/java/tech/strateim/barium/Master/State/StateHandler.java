@@ -57,6 +57,10 @@ public class StateHandler {
                         Log.severe("Socket connection to governor lost");
 
                         return;
+                    } else {
+                        Log.warning("Exception occurred when handling a packet (" + ex + ")");
+
+                        continue;
                     }
                 }
             }
