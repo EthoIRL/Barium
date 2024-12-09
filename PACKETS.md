@@ -5,7 +5,7 @@
 |:---------:|:----------:|:-----:|:------:|
 |     0     |  Register  | Init  | Plugin |
 |     1     |  Register  | Init  |  Gov   |
-|     2     | Disconnect |  Any  | Plugin |
+|     2     | Disconnect |  Any  |  Any   |
 |     3     |   Proxy    |       | Plugin |
 
 
