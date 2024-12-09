@@ -9,7 +9,7 @@ use uuid::Uuid;
 use crate::proto::{Disconnect, DisconnectReason, Register};
 use crate::state::{packet, registration};
 
-pub const MAXIMUM_PACKET_SIZE: u32 = 2048;
+pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
 pub struct Client {
     pub stream: TcpStream,
@@ -37,6 +37,11 @@ pub fn handle_client(mut client: Client) {
                 return;
             }
         };
+
+        if packet.data.len() > MAXIMUM_PACKET_SIZE {
+            
+            return;
+        }
 
         if packet.id == 2 {
             match handle_disconnect(&mut client, packet.data) {
