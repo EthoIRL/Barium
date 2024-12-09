@@ -1,9 +1,11 @@
 use std::io;
+
 use prost::Message;
 use uuid::Uuid;
+
 use crate::API_VERSION;
 use crate::proto::{Register, RegistrationResponse};
-use crate::state::client::{Client, MAXIMUM_PACKET_SIZE};
+use crate::state::client::{Client, Status};
 use crate::state::packet;
 
 #[derive(Debug)]

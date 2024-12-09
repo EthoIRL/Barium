@@ -1,5 +1,5 @@
 syntax = "proto3";
 
-package proxy;
+package anticheat;
 
 option java_multiple_files = true;
