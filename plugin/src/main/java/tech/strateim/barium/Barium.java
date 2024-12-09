@@ -47,6 +47,8 @@ public final class Barium extends JavaPlugin {
     @Override
     public void onDisable() {
         Remote.Disconnect(DisconnectReason.Shutdown);
+        Remote.Shutdown();
+
         PacketEvents.getAPI().terminate();
     }
 }

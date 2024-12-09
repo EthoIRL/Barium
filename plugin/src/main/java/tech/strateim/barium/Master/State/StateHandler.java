@@ -3,6 +3,7 @@ package tech.strateim.barium.Master.State;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
+import tech.strateim.barium.Master.Remote;
 import tech.strateim.barium.Master.State.Disconnection.DisconnectionHandler;
 import tech.strateim.barium.Master.State.Registration.RegistrationHandler;
 
@@ -21,13 +22,14 @@ public class StateHandler {
     private final InputStream SocketReceive;
     private final HashMap<Integer, AbstractState> stateHandlers = new HashMap<>();
 
-    public StateHandler(PacketHandler packetHandler, OutputStream socketOutput, InputStream socketReceive, Logger log) {
+    public StateHandler(PacketHandler packetHandler, OutputStream socketOutput, InputStream socketReceive, Logger log, Remote remote) {
         PacketHandler = packetHandler;
         SocketOutput = socketOutput;
         SocketReceive = socketReceive;
         Log = log;
 
-        stateHandlers.put(1, new RegistrationHandler(1, packetHandler, this, log));
+        stateHandlers.put(1, new RegistrationHandler(1, packetHandler, log, this));
+        stateHandlers.put(2, new DisconnectionHandler(2, packetHandler, log, remote, this));
     }
 
     public void StartReceiver() {

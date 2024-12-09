@@ -64,12 +64,16 @@ public class Remote {
         }
 
         PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
-        StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log);
+        StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log, this);
 
         ExecutorService.execute(StateHandler::StartReceiver);
         ExecutorService.execute(() -> InitRegistration(localServer, packetEvents));
 
         return PacketHandler;
+    }
+
+    public void Shutdown() {
+        ExecutorService.shutdown();
     }
 
     public void Disconnect(DisconnectReason reason) {
