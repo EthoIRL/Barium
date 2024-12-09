@@ -67,7 +67,7 @@ public class Remote {
         StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log);
 
         ExecutorService.execute(StateHandler::StartReceiver);
-        ExecutorService.execute(() -> StateHandler.RegistrationHandler.InitRegister(localServer, packetEvents));
+        ExecutorService.execute(() -> InitRegistration(localServer, packetEvents));
 
         return PacketHandler;
     }
@@ -81,5 +81,26 @@ public class Remote {
         }
 
         PacketHandler.SendPacket(disconnectBuilder.build(), 2);
+    }
+
+    private void InitRegistration(Server localServer, PacketEventsAPI<?> packetEvents) {
+        ServerManager serverManager = packetEvents.getServerManager();
+        Os system = PacketEventsConversion.SystemConversion(serverManager.getOS());
+        PluginManager pluginManager = localServer.getPluginManager();
+
+        Protocol.Builder protocolBuilder = Protocol.newBuilder()
+                .setGeyser(pluginManager.isPluginEnabled("Geyser-Spigot"))
+                .setViaBackwards(pluginManager.isPluginEnabled("ViaBackwards"))
+                .setViaRewind(pluginManager.isPluginEnabled("ViaRewind"))
+                .setViaVersion(pluginManager.isPluginEnabled("ViaVersion"));
+
+        Register register = Register.newBuilder()
+                .setPluginVersion(0)
+                .setServerVersion(serverManager.getVersion().getProtocolVersion())
+                .setOs(system)
+                .setProtocol(protocolBuilder)
+                .build();
+
+        PacketHandler.SendPacket(register, 0);
     }
 }

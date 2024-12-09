@@ -3,11 +3,13 @@ package tech.strateim.barium.Master.State;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
+import tech.strateim.barium.Master.State.Disconnection.DisconnectionHandler;
 import tech.strateim.barium.Master.State.Registration.RegistrationHandler;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class StateHandler {
@@ -17,7 +19,7 @@ public class StateHandler {
     private final Logger Log;
     private final OutputStream SocketOutput;
     private final InputStream SocketReceive;
-    public final RegistrationHandler RegistrationHandler;
+    private final HashMap<Integer, AbstractState> stateHandlers = new HashMap<>();
 
     public StateHandler(PacketHandler packetHandler, OutputStream socketOutput, InputStream socketReceive, Logger log) {
         PacketHandler = packetHandler;
@@ -25,7 +27,7 @@ public class StateHandler {
         SocketReceive = socketReceive;
         Log = log;
 
-        RegistrationHandler = new RegistrationHandler(packetHandler, this, log);
+        stateHandlers.put(1, new RegistrationHandler(1, packetHandler, this, log));
     }
 
     public void StartReceiver() {
@@ -42,14 +44,13 @@ public class StateHandler {
 
                     Log.warning("Packet received ID: " + packet.id());
 
-                    switch (packet.id()) {
-                        case 1 -> RegistrationHandler.HandleResponse(packet);
-                        default -> {
-                            Log.severe("UNKNOWN Packet Id received: " + packet.id());
-                            break;
-                        }
+                    if (!stateHandlers.containsKey((int)packet.id())) {
+                        Log.severe("Packet ID does not exist within stateHandlers!");
+
+                        continue;
                     }
 
+                    stateHandlers.get((int)packet.id()).HandleResponse(packet);
                 } catch (Exception ex) {
                     if (ex instanceof SocketException) {
                         State = Status.Crash;
