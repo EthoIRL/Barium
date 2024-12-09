@@ -29,3 +29,14 @@ message RegistrationResponse {
   bool Succeeded = 1;
   optional string UuidKey = 2;
 }
+
+enum DisconnectReason {
+  Shutdown = 0;
+  Crash = 1;
+  Unknown = 2;
+}
+
+message Disconnect {
+  optional string UuidKey = 1;
+  DisconnectReason Reason = 2;
+}

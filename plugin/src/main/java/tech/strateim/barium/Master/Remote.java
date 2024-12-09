@@ -1,9 +1,13 @@
 package tech.strateim.barium.Master;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.manager.server.ServerManager;
+import init.*;
 import org.bukkit.Server;
+import org.bukkit.plugin.PluginManager;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
+import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
 
 import javax.annotation.Nullable;
 import java.io.InputStream;
@@ -66,5 +70,16 @@ public class Remote {
         ExecutorService.execute(() -> StateHandler.RegistrationHandler.InitRegister(localServer, packetEvents));
 
         return PacketHandler;
+    }
+
+    public void Disconnect(DisconnectReason reason) {
+        Disconnect.Builder disconnectBuilder = Disconnect.newBuilder()
+                .setReason(reason);
+
+        if (StateHandler.Key != null) {
+            disconnectBuilder.setUuidKey(StateHandler.Key);
+        }
+
+        PacketHandler.SendPacket(disconnectBuilder.build(), 2);
     }
 }

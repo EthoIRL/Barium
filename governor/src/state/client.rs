@@ -1,10 +1,12 @@
 use std::cmp::PartialEq;
-use std::net::TcpStream;
+use std::net::{IpAddr, TcpStream};
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
+use prost::Message;
 use uuid::Uuid;
 
-use crate::proto::Register;
+use crate::proto::{Disconnect, DisconnectReason, Register};
 use crate::state::{packet, registration};
 
 pub const MAXIMUM_PACKET_SIZE: u32 = 2048;
@@ -34,6 +36,20 @@ pub fn handle_client(mut client: Client) {
                 return;
             }
         };
+
+        if packet.id == 2 {
+            match handle_disconnect(&mut client, packet.data) {
+                (disconnect, reason) => {
+                    if disconnect {
+                        println!("[GOV] Client disconnected, Reason: ({:#?})", reason);
+                        return;
+                    }
+
+                    eprintln!("Disconnect packet id received; but failed to disconnect!");
+                    return;
+                }
+            }
+        }
 
         match &client.status {
             Status::Initialization => {
@@ -70,4 +86,44 @@ pub fn handle_client(mut client: Client) {
             }
         }
     }
+}
+
+pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, DisconnectReason) {
+    let disconnect = match Disconnect::decode(&*packet_data) {
+        Ok(data) => data,
+        Err(_) => {
+            println!("Error decoding disconnect");
+            return (false, DisconnectReason::Unknown);
+        }
+    };
+
+    if client.status != Status::Initialization {
+        let packet_uuid = match &disconnect.uuid_key {
+            Some(uuid) => {
+                match Uuid::from_str(&*uuid) {
+                    Ok(uuid) => uuid,
+                    Err(_) => {
+                        return (false, DisconnectReason::Unknown);
+                    }
+                }
+            },
+            None => {
+                return (false, DisconnectReason::Unknown);
+            }
+        };
+
+        let server_uuid = match client.key {
+            Some(uuid) => uuid,
+            None => {
+                eprintln!("[GOV] Server key invalid past Initialization phase.");
+                return (false, DisconnectReason::Unknown);
+            }
+        };
+
+        if server_uuid != packet_uuid {
+            return (false, DisconnectReason::Unknown);
+        }
+    }
+
+    return (true, disconnect.reason());
 }

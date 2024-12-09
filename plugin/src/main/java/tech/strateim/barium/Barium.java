@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.TimeStampMode;
+import init.DisconnectReason;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,6 +46,7 @@ public final class Barium extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Remote.Disconnect(DisconnectReason.Shutdown);
         PacketEvents.getAPI().terminate();
     }
 }
