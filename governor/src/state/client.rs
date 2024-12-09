@@ -8,6 +8,7 @@ use uuid::Uuid;
 
 use crate::proto::{Disconnect, DisconnectReason, Register};
 use crate::state::{packet, registration};
+use crate::state::registration::RegistrationError;
 
 pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
@@ -39,16 +40,7 @@ pub fn handle_client(mut client: Client) {
         };
 
         if packet.data.len() > MAXIMUM_PACKET_SIZE {
-            let disconnect_packet = Disconnect {
-                uuid_key: match client.key {
-                    Some(key) => Some(key.to_string()),
-                    None => None
-                },
-                reason: i32::from(DisconnectReason::Unknown)
-            };
-
-            let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
-            
+            disconnect_client(&mut client, DisconnectReason::Unknown);
             return;
         }
 
@@ -69,30 +61,20 @@ pub fn handle_client(mut client: Client) {
         match &client.status {
             Status::Initialization => {
                 if packet.id != 0 {
-                    println!("Unknown packet received during init phase");
+                    disconnect_client(&mut client, DisconnectReason::Unknown);
+                    eprintln!("Unknown packet received during init phase");
                     return;
                 }
 
-                let authenticated = match registration::handle_registration(&mut client, packet.data) {
-                    Ok(_) => {
-                        true
-                    },
-                    Err(err) => {
-                        println!("[GOV] Failed to handle registration, ({:#?})", err);
-                        false
-                    }
-                };
+                if let Err(err) = registration::handle_registration(&mut client, packet.data) {
+                    println!("Failed to authenticate client, (Reason: {:#?})", err);
 
-                println!("Authenticated: {authenticated}");
+                    disconnect_client(&mut client, match err {
+                        RegistrationError::MismatchVersion => DisconnectReason::MismatchVersion,
+                        _ => DisconnectReason::Unknown
+                    });
 
-                match registration::handle_response(&mut client, authenticated) {
-                    Ok(_) => {
-                        client.status = Status::Registered;
-                        println!("{:#?}", client.state.unwrap());
-                    }
-                    Err(_) => {
-                        return;
-                    }
+                    return;
                 }
             },
             _ => {
@@ -107,7 +89,7 @@ pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, Di
     let disconnect = match Disconnect::decode(&*packet_data) {
         Ok(data) => data,
         Err(_) => {
-            println!("Error decoding disconnect");
+            eprintln!("Error decoding disconnect");
             return (false, DisconnectReason::Unknown);
         }
     };
@@ -141,4 +123,16 @@ pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, Di
     }
 
     return (true, disconnect.reason());
+}
+
+fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
+    let disconnect_packet = Disconnect {
+        uuid_key: match client.key {
+            Some(key) => Some(key.to_string()),
+            None => None
+        },
+        reason: i32::from(reason)
+    };
+
+    let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
 }

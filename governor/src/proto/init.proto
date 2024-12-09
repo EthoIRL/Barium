@@ -33,7 +33,8 @@ message RegistrationResponse {
 enum DisconnectReason {
   Shutdown = 0;
   Crash = 1;
-  Unknown = 2;
+  MismatchVersion = 2;
+  Unknown = 3;
 }
 
 message Disconnect {
