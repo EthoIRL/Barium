@@ -39,6 +39,15 @@ pub fn handle_client(mut client: Client) {
         };
 
         if packet.data.len() > MAXIMUM_PACKET_SIZE {
+            let disconnect_packet = Disconnect {
+                uuid_key: match client.key {
+                    Some(key) => Some(key.to_string()),
+                    None => None
+                },
+                reason: i32::from(DisconnectReason::Unknown)
+            };
+
+            let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
             
             return;
         }
