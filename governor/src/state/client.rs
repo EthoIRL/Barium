@@ -15,7 +15,8 @@ pub struct Client {
     pub stream: TcpStream,
     pub status: Status,
     pub state: Option<Register>,
-    pub key: Option<Uuid>
+    pub key: Option<Uuid>,
+    pub ip_addr: IpAddr
 }
 
 #[derive(PartialEq)]

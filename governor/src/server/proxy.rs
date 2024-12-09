@@ -16,13 +16,22 @@ pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHand
     thread::spawn(move || {
         for stream in listener.incoming() {
             if let Ok(tcp_stream) = stream {
-                println!("[GOV] Incoming connection");
+                let peer_address = match tcp_stream.peer_addr() {
+                    Ok(addr) => addr.ip(),
+                    Err(err) => {
+                        eprintln!("Failed to get peer address: ({err})");
+                        continue;
+                    }
+                };
+
+                println!("[GOV] Incoming connection from ({})", peer_address.to_string());
 
                 let client = Client {
                     stream: tcp_stream,
                     status: Status::Initialization,
                     state: None,
-                    key: None
+                    key: None,
+                    ip_addr: peer_address
                 };
 
                 if let Ok(mut pool) = pool.lock() {
