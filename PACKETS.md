@@ -1,15 +1,13 @@
 
 ## Plugin <-> Governor
 
-| Packet ID |    Name    | State | Sender |
-|:---------:|:----------:|:-----:|:------:|
-|     0     |  Register  | Init  | Plugin |
-|     1     |  Register  | Init  |  Gov   |
-|     2     | Disconnect |  Any  |  Any   |
-|     3     |   Proxy    |       | Plugin |
+## ServerRegistration
+  - Register
+    - Id: 0
+  - Response
+    - Id: 1
 
-
-### Sender
-Can only be sent by X, & cannot be handled.
+## DisconnectServer
+  - Id: 2
 
 ## Plugin <-> Governor <-> Anticheat 
