@@ -8,7 +8,7 @@ import generic.Protocol;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 import server.DisconnectServer;
-import server.RegisterServer;
+import server.ServerRegistration;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
 import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
@@ -102,7 +102,7 @@ public class Remote {
                 .setViaRewind(pluginManager.isPluginEnabled("ViaRewind"))
                 .setViaVersion(pluginManager.isPluginEnabled("ViaVersion"));
 
-        RegisterServer register = RegisterServer.newBuilder()
+        ServerRegistration.Register register = ServerRegistration.Register.newBuilder()
                 .setPluginVersion(0)
                 .setServerVersion(serverManager.getVersion().getProtocolVersion())
                 .setOs(system)

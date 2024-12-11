@@ -4,7 +4,7 @@ use prost::Message;
 use uuid::Uuid;
 
 use crate::API_VERSION;
-use crate::proto::server::{RegisterServer, RegistrationResponse};
+use crate::proto::server::server_registration::{Register, Response};
 use crate::state::client::{Client, Status};
 use crate::state::packet;
 
@@ -15,8 +15,8 @@ pub enum RegistrationError {
     Unknown,
 }
 
-pub fn verify_registration(packet: Vec<u8>) -> Result<RegisterServer, RegistrationError> {
-    let register = match RegisterServer::decode(&*packet) {
+pub fn verify_registration(packet: Vec<u8>) -> Result<Register, RegistrationError> {
+    let register = match Register::decode(&*packet) {
         Ok(register) => {
             register
         }
@@ -52,7 +52,7 @@ pub fn handle_registration(client: &mut Client, packet: Vec<u8>) -> Result<(), R
 }
 
 fn handle_response(client: &mut Client, authenticated: bool) -> Result<Uuid, io::Error> {
-    let mut response = RegistrationResponse {
+    let mut response = Response {
         succeeded: authenticated,
         uuid_key: None,
     };

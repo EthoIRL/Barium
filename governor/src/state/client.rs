@@ -6,7 +6,8 @@ use std::time::Duration;
 use prost::Message;
 use uuid::Uuid;
 use crate::proto::generic::DisconnectReason;
-use crate::proto::server::{DisconnectServer, RegisterServer};
+use crate::proto::server::DisconnectServer;
+use crate::proto::server::server_registration::Register;
 
 use crate::state::{packet, registration};
 use crate::state::registration::RegistrationError;
@@ -16,7 +17,7 @@ pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 pub struct Client {
     pub stream: TcpStream,
     pub status: Status,
-    pub state: Option<RegisterServer>,
+    pub state: Option<Register>,
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr
 }

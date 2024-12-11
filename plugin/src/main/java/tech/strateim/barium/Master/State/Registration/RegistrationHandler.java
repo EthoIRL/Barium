@@ -1,6 +1,6 @@
 package tech.strateim.barium.Master.State.Registration;
 
-import server.RegistrationResponse;
+import server.ServerRegistration;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
@@ -18,7 +18,7 @@ public class RegistrationHandler extends AbstractState {
     }
 
     public void HandleResponse(Packet packet) throws Exception {
-        RegistrationResponse response = (RegistrationResponse) packetHandler.SerializePacket(RegistrationResponse.getDefaultInstance(), packet);
+        ServerRegistration.Response response = (ServerRegistration.Response) packetHandler.SerializePacket(ServerRegistration.Response.getDefaultInstance(), packet);
 
         if (response == null) {
             return;
