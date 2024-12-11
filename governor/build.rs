@@ -14,7 +14,7 @@ fn main() -> Result<()> {
         })
         .collect::<Vec<_>>();
 
-    prost_build::compile_protos(&proto_files, &["src/"])?;
+    prost_build::compile_protos(&proto_files, &["src/proto/"])?;
 
     Ok(())
 }
