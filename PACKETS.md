@@ -1,5 +1,5 @@
 
-## Plugin <-> Governor
+## Plugin
 
 ## ServerRegistration
   - Register
@@ -10,4 +10,10 @@
 ## DisconnectServer
   - Id: 2
 
-## Plugin <-> Governor <-> Anticheat 
+## Anticheat
+
+## NodeRegistration
+  - Register
+    - Id: 0
+  - Response
+    - Id: 1
