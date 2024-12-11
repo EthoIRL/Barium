@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package anticheat;
+
+option java_multiple_files = true;
+
+import "generic.proto";
+
+message RegisterNode {
+  int32 NodeVersion = 1;
+  NodeResources resources = 2;
+}
+
+message NodeResources {
+  uint32 memory = 1;
+  uint32 cpu = 2;
+}
+
+//message AnticheatMessage {
+//  uint32 messageId = 1;
+//  uint32 messageSize = 2;
+//  bytes message = 3;
+//}
+
+message DisconnectNode {
+  generic.DisconnectReason Reason = 1;
+}

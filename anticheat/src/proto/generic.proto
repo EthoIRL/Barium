@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package generic;
+
+option java_multiple_files = true;
+
+enum Os {
+  Linux = 0;
+  Windows = 1;
+  MacOS = 2;
+  Other = 3;
+}
+
+message Protocol {
+  bool ViaVersion = 1;
+  bool ViaBackwards = 2;
+  bool ViaRewind = 3;
+  bool Geyser = 4;
+}
+
+enum DisconnectReason {
+  Shutdown = 0;
+  Crash = 1;
+  MismatchVersion = 2;
+  Unknown = 3;
+}

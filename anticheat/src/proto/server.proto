@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package server;
+
+option java_multiple_files = true;
+
+import "generic.proto";
+
+message ServerRegistration {
+  message Register {
+    int32 PluginVersion = 1;
+    int32 ServerVersion = 2;
+    generic.Os Os = 3;
+    generic.Protocol Protocol = 4;
+  }
+
+  message Response {
+    bool Succeeded = 1;
+    optional string UuidKey = 2;
+  }
+}
+
+message DisconnectServer {
+  optional string UuidKey = 1;
+  generic.DisconnectReason Reason = 2;
+}
