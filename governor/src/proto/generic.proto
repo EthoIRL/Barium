@@ -1,15 +1,8 @@
 syntax = "proto3";
 
-package init;
+package generic;
 
 option java_multiple_files = true;
-
-message Register {
-  int32 PluginVersion = 1;
-  int32 ServerVersion = 2;
-  Os Os = 3;
-  Protocol Protocol = 4;
-}
 
 enum Os {
   Linux = 0;
@@ -25,19 +18,9 @@ message Protocol {
   bool Geyser = 4;
 }
 
-message RegistrationResponse {
-  bool Succeeded = 1;
-  optional string UuidKey = 2;
-}
-
 enum DisconnectReason {
   Shutdown = 0;
   Crash = 1;
   MismatchVersion = 2;
   Unknown = 3;
-}
-
-message Disconnect {
-  optional string UuidKey = 1;
-  DisconnectReason Reason = 2;
 }
