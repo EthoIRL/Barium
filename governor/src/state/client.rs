@@ -5,8 +5,9 @@ use std::thread;
 use std::time::Duration;
 use prost::Message;
 use uuid::Uuid;
+use crate::proto::generic::DisconnectReason;
+use crate::proto::server::{DisconnectServer, RegisterServer};
 
-use crate::proto::{Disconnect, DisconnectReason, Register};
 use crate::state::{packet, registration};
 use crate::state::registration::RegistrationError;
 
@@ -15,7 +16,7 @@ pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 pub struct Client {
     pub stream: TcpStream,
     pub status: Status,
-    pub state: Option<Register>,
+    pub state: Option<RegisterServer>,
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr
 }
@@ -86,7 +87,7 @@ pub fn handle_client(mut client: Client) {
 }
 
 pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, DisconnectReason) {
-    let disconnect = match Disconnect::decode(&*packet_data) {
+    let disconnect = match DisconnectServer::decode(&*packet_data) {
         Ok(data) => data,
         Err(_) => {
             eprintln!("Error decoding disconnect");
@@ -126,7 +127,7 @@ pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, Di
 }
 
 fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
-    let disconnect_packet = Disconnect {
+    let disconnect_packet = DisconnectServer {
         uuid_key: match client.key {
             Some(key) => Some(key.to_string()),
             None => None
