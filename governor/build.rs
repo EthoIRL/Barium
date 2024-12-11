@@ -1,6 +1,6 @@
 use std::io::Result;
 
-const PROTO_DIR: &str = "src/proto";
+const PROTO_DIR: &str = "../proto";
 
 fn main() -> Result<()> {
     let proto_files = std::fs::read_dir(PROTO_DIR)?
