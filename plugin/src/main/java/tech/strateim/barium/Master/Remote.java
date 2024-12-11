@@ -2,9 +2,13 @@ package tech.strateim.barium.Master;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
-import init.*;
+import generic.DisconnectReason;
+import generic.Os;
+import generic.Protocol;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
+import server.DisconnectServer;
+import server.RegisterServer;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
 import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
@@ -77,7 +81,7 @@ public class Remote {
     }
 
     public void Disconnect(DisconnectReason reason) {
-        Disconnect.Builder disconnectBuilder = Disconnect.newBuilder()
+        DisconnectServer.Builder disconnectBuilder = DisconnectServer.newBuilder()
                 .setReason(reason);
 
         if (StateHandler.Key != null) {
@@ -98,7 +102,7 @@ public class Remote {
                 .setViaRewind(pluginManager.isPluginEnabled("ViaRewind"))
                 .setViaVersion(pluginManager.isPluginEnabled("ViaVersion"));
 
-        Register register = Register.newBuilder()
+        RegisterServer register = RegisterServer.newBuilder()
                 .setPluginVersion(0)
                 .setServerVersion(serverManager.getVersion().getProtocolVersion())
                 .setOs(system)

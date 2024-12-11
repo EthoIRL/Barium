@@ -1,6 +1,6 @@
 package tech.strateim.barium.Master.State.Disconnection;
 
-import init.Disconnect;
+import server.DisconnectServer;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
@@ -24,7 +24,7 @@ public class DisconnectionHandler extends AbstractState {
 
     @Override
     public void HandleResponse(Packet packet) throws Exception {
-        Disconnect response = (Disconnect) packetHandler.SerializePacket(Disconnect.getDefaultInstance(), packet);
+        DisconnectServer response = (DisconnectServer) packetHandler.SerializePacket(DisconnectServer.getDefaultInstance(), packet);
 
         if (response == null) {
             return;

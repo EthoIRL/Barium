@@ -1,6 +1,6 @@
 package tech.strateim.barium.Master.State.Registration;
 
-import init.RegistrationResponse;
+import server.RegistrationResponse;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;

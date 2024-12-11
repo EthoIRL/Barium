@@ -1,7 +1,7 @@
 package tech.strateim.barium.Master.Utilities;
 
 import com.github.retrooper.packetevents.manager.server.SystemOS;
-import init.Os;
+import generic.Os;
 
 public class PacketEventsConversion {
     public static Os SystemConversion(SystemOS systemOS) {
