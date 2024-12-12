@@ -1,4 +1,5 @@
 mod node;
+mod packet;
 mod proto;
 
 pub const API_VERSION: i32 = 0;
