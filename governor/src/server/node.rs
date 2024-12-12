@@ -9,10 +9,10 @@ pub struct Node {
 }
 
 pub fn start_node_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
-    let listener = TcpListener::bind(address).unwrap();
     let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
 
     let pool = thread_pool.clone();
+    let listener = TcpListener::bind(address)?;
 
     thread::spawn(move || {
         for stream in listener.incoming() {
