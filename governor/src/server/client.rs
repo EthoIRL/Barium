@@ -13,6 +13,7 @@ use crate::plugin::registration::RegistrationError;
 use crate::proto::generic::DisconnectReason;
 use crate::proto::server::DisconnectServer;
 use crate::proto::server::server_registration::Register;
+use crate::server::node::Node;
 
 
 pub const MAXIMUM_PACKET_SIZE: usize = 2048;
@@ -32,7 +33,7 @@ pub enum Status {
     Crash
 }
 
-pub fn start_plugin_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
+pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
     let listener = TcpListener::bind(address)?;
 
     let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
@@ -59,8 +60,10 @@ pub fn start_plugin_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHan
                     ip_addr: peer_address
                 };
 
+                let list = node_list.clone();
+
                 if let Ok(mut pool) = pool.lock() {
-                    pool.push(thread::spawn(|| handle_client(client)));
+                    pool.push(thread::spawn(move || handle_client(client, list)));
                 }
             }
         }
@@ -69,10 +72,11 @@ pub fn start_plugin_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHan
     Ok(thread_pool)
 }
 
-pub fn handle_client(mut client: Client) {
+pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
     loop {
+
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => data,
             Err(err) => {
@@ -176,6 +180,6 @@ fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
         reason: i32::from(reason)
     };
 
-    
+
     let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
 }

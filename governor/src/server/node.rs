@@ -2,16 +2,12 @@ use std::{thread, u16};
 use std::io::Error;
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
-use std::thread::JoinHandle;
 
 pub struct Node {
     pub stream: TcpStream,
 }
 
-pub fn start_node_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
-    let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
-
-    let pool = thread_pool.clone();
+pub fn start_node_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) -> Result<(), Error> {
     let listener = TcpListener::bind(address)?;
 
     thread::spawn(move || {
@@ -27,20 +23,24 @@ pub fn start_node_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandl
 
                 println!("[GOV] Incoming connection from ({})", peer_address.to_string());
 
-                let node = Node {
+                let node = Arc::new(Mutex::new(Node {
                     stream: tcp_stream
-                };
+                }));
 
-                if let Ok(mut pool) = pool.lock() {
-                    pool.push(thread::spawn(|| handle_client(node)));
+                if let Ok(mut node_list) = node_list.lock() {
+                    node_list.push(node.clone());
                 }
+
+                thread::spawn(|| handle_node(node));
             }
         }
     });
 
-    Ok(thread_pool)
+    Ok(())
 }
 
-pub fn handle_client(mut node: Node) {
+pub fn handle_node(mut node: Arc<Mutex<Node>>) {
+    loop {
 
+    }
 }
