@@ -1,7 +1,7 @@
 use std::thread;
 use std::time::Duration;
 
-use crate::server::proxy;
+use crate::server::plugin;
 use crate::state::client::Client;
 
 mod server;
@@ -16,7 +16,7 @@ fn main() {
     let address = ("127.0.0.1", 3238);
     println!("[GOV] Starting proxy server, {:?}", &address);
 
-    proxy::start_proxy_server(address).unwrap();
+    plugin::start_plugin_server(address).unwrap();
 
     loop {
         thread::sleep(Duration::from_secs(1));

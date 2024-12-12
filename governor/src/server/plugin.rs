@@ -7,7 +7,7 @@ use std::thread::JoinHandle;
 use crate::state::client;
 use crate::state::client::{Client, Status};
 
-pub fn start_proxy_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
+pub fn start_plugin_server(address: (&str, u16)) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
     let listener = TcpListener::bind(address).unwrap();
 
     let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
