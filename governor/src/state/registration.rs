@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::API_VERSION;
 use crate::proto::server::server_registration::{Register, Response};
-use crate::state::client::{Client, Status};
+use crate::server::plugin::{Client, Status};
 use crate::state::packet;
 
 #[derive(Debug)]

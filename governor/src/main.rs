@@ -2,7 +2,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::server::plugin;
-use crate::state::client::Client;
+use crate::server::plugin::Client;
 
 mod server;
 mod proto;

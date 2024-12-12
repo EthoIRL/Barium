@@ -1,3 +1,2 @@
-pub mod client;
 pub mod registration;
-mod packet;
+pub mod packet;
