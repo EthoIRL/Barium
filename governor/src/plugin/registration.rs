@@ -5,8 +5,8 @@ use uuid::Uuid;
 
 use crate::API_VERSION;
 use crate::proto::server::server_registration::{Register, Response};
-use crate::server::plugin::{Client, Status};
-use crate::state::packet;
+use crate::server::client::{Client, Status};
+use crate::packet;
 
 #[derive(Debug)]
 pub enum RegistrationError {

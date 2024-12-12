@@ -7,12 +7,13 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 use prost::Message;
 use uuid::Uuid;
+use crate::packet;
+use crate::plugin::registration;
+use crate::plugin::registration::RegistrationError;
 use crate::proto::generic::DisconnectReason;
 use crate::proto::server::DisconnectServer;
 use crate::proto::server::server_registration::Register;
-use crate::state::{packet, registration};
 
-use crate::state::registration::RegistrationError;
 
 pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
