@@ -1,3 +1,4 @@
+use std::thread;
 use crate::node::mesh;
 
 mod node;
@@ -12,6 +13,8 @@ fn main() {
     println!("Hello, world!");
 
     for i in 0..2 {
-        mesh::authed_connection(NODE_GOVERNOR, "");
+        thread::spawn(|| mesh::authed_connection(NODE_GOVERNOR, ""));
     }
+
+    loop {}
 }
