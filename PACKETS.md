@@ -17,3 +17,6 @@
     - Id: 0
   - Response
     - Id: 1
+
+## DisconnectNode
+  - Id: 2
