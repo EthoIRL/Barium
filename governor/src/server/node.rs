@@ -2,6 +2,10 @@ use std::{thread, u16};
 use std::io::Error;
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
+use crate::anticheat::registration::NodeRegistar;
+use crate::packet;
+use crate::proto::anticheat::DisconnectNode;
+use crate::proto::generic::DisconnectReason;
 
 pub struct Node {
     pub stream: TcpStream,
@@ -40,7 +44,33 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mute
 }
 
 pub fn handle_node(mut node: Arc<Mutex<Node>>) {
-    loop {
+    let mut packet_id_buffer = [0u8; 2];
+    let mut data_length_buffer = [0u8; 4];
 
+    loop {
+        if let Ok(mut node) = node.lock() {
+            let packet = match packet::get_packet(&mut node.stream, &mut packet_id_buffer, &mut data_length_buffer) {
+                Ok(data) =>  {
+                    println!("Retrieved data successfully");
+                    data
+                },
+                Err(err) => {
+                    println!("[GOV] Failed to get packet, ({:#?})", err);
+                    return;
+                }
+            };
+
+            println!("PACKET ID: {}", packet.id);
+
+        };
     }
+}
+
+
+pub fn disconnect_node(node: &mut Node, reason: DisconnectReason) {
+    let disconnect_packet = DisconnectNode {
+        reason: i32::from(reason)
+    };
+
+    let _ = packet::send_packet(disconnect_packet, 2, &mut node.stream);
 }
