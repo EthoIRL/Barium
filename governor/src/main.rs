@@ -9,6 +9,7 @@ mod server;
 mod proto;
 mod plugin;
 pub mod packet;
+mod anticheat;
 
 pub const API_VERSION: i32 = 0;
 const CLIENT_ADDRESS: (&str, u16) = ("127.0.0.1", 3238);

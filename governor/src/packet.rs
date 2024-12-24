@@ -22,6 +22,10 @@ pub struct GenericPacket {
     pub data: Vec<u8>
 }
 
+pub trait GenericHandler<T> {
+    fn handle(parent: &mut T, packet: GenericPacket) -> Result<(), Error>;
+}
+
 pub fn get_packet(stream: &mut TcpStream, packet_id_buffer: &mut [u8; 2], data_length_buffer: &mut [u8; 4]) -> Result<GenericPacket, Error> {
     stream.read_exact(packet_id_buffer)?;
     let packet_id = u16::from_le_bytes(*packet_id_buffer);

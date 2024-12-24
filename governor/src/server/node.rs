@@ -1,9 +1,11 @@
 use std::{thread, u16};
+use std::collections::HashMap;
 use std::io::Error;
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use crate::anticheat::registration::NodeRegistar;
 use crate::packet;
+use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::DisconnectNode;
 use crate::proto::generic::DisconnectReason;
 
@@ -47,6 +49,9 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
+    let mut known_packets: HashMap<u16, fn(&mut Node, GenericPacket) -> Result<(), Error>> = HashMap::new();
+    known_packets.insert(8, NodeRegistar::handle);
+
     loop {
         if let Ok(mut node) = node.lock() {
             let packet = match packet::get_packet(&mut node.stream, &mut packet_id_buffer, &mut data_length_buffer) {
@@ -62,6 +67,8 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
             println!("PACKET ID: {}", packet.id);
 
+            let packet_handler = known_packets.get(&packet.id).unwrap();
+            packet_handler(&mut node, packet).unwrap();
         };
     }
 }
