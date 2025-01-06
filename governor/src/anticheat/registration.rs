@@ -4,8 +4,8 @@ use crate::server::node::Node;
 
 pub struct NodeRegistar;
 
-impl GenericHandler<Node> for NodeRegistar {
-    fn handle(node: &mut Node, packet: GenericPacket) -> Result<(), Error> {
+impl GenericHandler<Node, GenericPacket> for NodeRegistar {
+    fn handle(node: &mut Node, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         todo!()
     }
 }
