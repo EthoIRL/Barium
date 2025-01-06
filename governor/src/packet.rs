@@ -22,6 +22,11 @@ pub struct GenericPacket {
     pub data: Vec<u8>
 }
 
+impl GenericPacket {
+    pub fn decode<T: Message + Default>(&self) -> Result<T, Error> {
+        T::decode(&*self.data).map_err(|err| Error::from(err))
+    }
+}
 
 pub trait GenericHandler<T, Y> {
     fn handle(parent: &mut T, packet: Y) -> Result<(), Box<dyn std::error::Error>>;
