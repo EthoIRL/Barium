@@ -23,7 +23,8 @@ pub struct Client {
     pub status: Status,
     pub state: Option<Register>,
     pub key: Option<Uuid>,
-    pub ip_addr: IpAddr
+    pub ip_addr: IpAddr,
+    pub connected: bool,
 }
 
 #[derive(PartialEq)]
@@ -76,6 +77,9 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
     loop {
+        if !client.connected {
+            return;
+        }
 
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => data,
