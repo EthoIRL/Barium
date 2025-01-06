@@ -67,8 +67,15 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
             println!("PACKET ID: {}", packet.id);
 
-            let packet_handler = known_packets.get(&packet.id).unwrap();
-            packet_handler(&mut node, packet).unwrap();
+            let packet_handle = match known_packets.get(&packet.id) {
+                Some(handler) => handler,
+                None => {
+                    println!("PacketID not found, ({})", packet.id);
+                    continue;
+                }
+            };
+
+            packet_handle(&mut node, packet).unwrap();
         };
     }
 }
