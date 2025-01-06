@@ -1,20 +1,18 @@
 use std::{thread, u16};
+use std::collections::HashMap;
 use std::io::Error;
 use std::net::{IpAddr, TcpListener, TcpStream};
-use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
-use std::time::Duration;
-use prost::Message;
 use uuid::Uuid;
 use crate::packet;
-use crate::plugin::registration;
-use crate::plugin::registration::RegistrationError;
+use crate::packet::{GenericHandler, GenericPacket};
+use crate::plugin::disconnect::ClientDisconnect;
+use crate::plugin::registration::ClientRegistration;
 use crate::proto::generic::DisconnectReason;
 use crate::proto::server::DisconnectServer;
 use crate::proto::server::server_registration::Register;
 use crate::server::node::Node;
-
 
 pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
@@ -31,7 +29,7 @@ pub struct Client {
 pub enum Status {
     Initialization,
     Registered,
-    Crash
+    Crash,
 }
 
 pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
@@ -58,7 +56,8 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
                     status: Status::Initialization,
                     state: None,
                     key: None,
-                    ip_addr: peer_address
+                    ip_addr: peer_address,
+                    connected: true
                 };
 
                 let list = node_list.clone();
@@ -68,7 +67,7 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
                 }
             }
         }
-    }); 
+    });
 
     Ok(thread_pool)
 }
@@ -76,6 +75,11 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
 pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
+
+    let mut known_packets: HashMap<u16, fn(&mut Client, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
+    known_packets.insert(0, ClientRegistration::handle);
+    known_packets.insert(2, ClientDisconnect::handle);
+
     loop {
         if !client.connected {
             return;
@@ -94,96 +98,37 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
             return;
         }
 
-        if packet.id == 2 {
-            match handle_disconnect(&mut client, packet.data) {
-                (disconnect, reason) => {
-                    if disconnect {
-                        println!("[GOV] Client disconnected, Reason: ({:#?})", reason);
-                        return;
-                    }
-
-                    eprintln!("Disconnect packet id received; but failed to disconnect!");
-                    return;
-                }
+        if client.status == Status::Initialization {
+            if packet.id != 0 {
+                disconnect_client(&mut client, DisconnectReason::Unknown);
+                return;
             }
         }
 
-        match &client.status {
-            Status::Initialization => {
-                if packet.id != 0 {
-                    disconnect_client(&mut client, DisconnectReason::Unknown);
-                    eprintln!("Unknown packet received during init phase");
-                    return;
-                }
-
-                if let Err(err) = registration::handle_registration(&mut client, packet.data) {
-                    println!("Failed to authenticate client, (Reason: {:#?})", err);
-
-                    disconnect_client(&mut client, match err {
-                        RegistrationError::MismatchVersion => DisconnectReason::MismatchVersion,
-                        _ => DisconnectReason::Unknown
-                    });
-
-                    return;
-                }
-            },
-            _ => {
-                thread::sleep(Duration::from_millis(1));
+        let packet_handle = match known_packets.get(&packet.id) {
+            Some(handler) => handler,
+            None => {
+                println!("PacketID not found, ({})", packet.id);
                 continue;
             }
-        }
+        };
+
+        packet_handle(&mut client, packet).unwrap();
     }
 }
 
-pub fn handle_disconnect(client: &mut Client, packet_data: Vec<u8>) -> (bool, DisconnectReason) {
-    let disconnect = match DisconnectServer::decode(&*packet_data) {
-        Ok(data) => data,
-        Err(_) => {
-            eprintln!("Error decoding disconnect");
-            return (false, DisconnectReason::Unknown);
-        }
-    };
+pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
+    println!("[GOV] Client disconnected, Reason: ({:#?})", reason);
 
-    if client.status != Status::Initialization {
-        let packet_uuid = match &disconnect.uuid_key {
-            Some(uuid) => {
-                match Uuid::from_str(&*uuid) {
-                    Ok(uuid) => uuid,
-                    Err(_) => {
-                        return (false, DisconnectReason::Unknown);
-                    }
-                }
-            },
-            None => {
-                return (false, DisconnectReason::Unknown);
-            }
-        };
+    client.connected = false;
 
-        let server_uuid = match client.key {
-            Some(uuid) => uuid,
-            None => {
-                eprintln!("[GOV] Server key invalid past Initialization phase.");
-                return (false, DisconnectReason::Unknown);
-            }
-        };
-
-        if server_uuid != packet_uuid {
-            return (false, DisconnectReason::Unknown);
-        }
-    }
-
-    return (true, disconnect.reason());
-}
-
-fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
     let disconnect_packet = DisconnectServer {
         uuid_key: match client.key {
             Some(key) => Some(key.to_string()),
             None => None
         },
-        reason: i32::from(reason)
+        reason: i32::from(reason),
     };
-
 
     let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
 }
