@@ -22,8 +22,9 @@ pub struct GenericPacket {
     pub data: Vec<u8>
 }
 
-pub trait GenericHandler<T> {
-    fn handle(parent: &mut T, packet: GenericPacket) -> Result<(), Error>;
+
+pub trait GenericHandler<T, Y> {
+    fn handle(parent: &mut T, packet: Y) -> Result<(), Box<dyn std::error::Error>>;
 }
 
 pub fn get_packet(stream: &mut TcpStream, packet_id_buffer: &mut [u8; 2], data_length_buffer: &mut [u8; 4]) -> Result<GenericPacket, Error> {
