@@ -13,7 +13,7 @@ fn main() {
     println!("Hello, world!");
 
     for i in 0..2 {
-        thread::spawn(|| mesh::authed_connection(NODE_GOVERNOR, ""));
+        thread::spawn(|| mesh::authed_connection(NODE_GOVERNOR, "shared key"));
     }
 
     loop {}

@@ -9,7 +9,8 @@ import "generic.proto";
 message NodeRegistration {
   message Register {
     int32 NodeVersion = 1;
-    NodeResources resources = 2;
+    string SharedKey = 2;
+    NodeResources resources = 3;
   }
   message Response {
     bool Succeeded = 1;

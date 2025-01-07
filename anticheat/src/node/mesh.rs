@@ -10,6 +10,7 @@ pub fn authed_connection(governor: (&str, u16), key: &str) -> Result<TcpStream, 
 
     let registration = node_registration::Register {
         node_version: API_VERSION,
+        shared_key: key.to_string(),
         resources: Some(NodeResources {
             memory: 1,
             cpu: 1,
