@@ -89,6 +89,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
             Ok(data) => data,
             Err(err) => {
                 println!("[GOV] Failed to get packet, ({:#?})", err);
+                disconnect_client(&mut client, DisconnectReason::Crash);
                 return;
             }
         };

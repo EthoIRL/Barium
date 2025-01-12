@@ -61,6 +61,7 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
                 },
                 Err(err) => {
                     println!("[GOV] Failed to get packet, ({:#?})", err);
+                    disconnect_node(&mut node, DisconnectReason::Crash);
                     return;
                 }
             };
