@@ -30,7 +30,9 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mute
                 println!("[GOV] Incoming connection from ({})", peer_address.to_string());
 
                 let node = Arc::new(Mutex::new(Node {
-                    stream: tcp_stream
+                    stream: tcp_stream,
+                    resources: None,
+                    connected: true
                 }));
 
                 if let Ok(mut node_list) = node_list.lock() {
@@ -54,6 +56,10 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
     loop {
         if let Ok(mut node) = node.lock() {
+            if !node.connected {
+                return;
+            }
+
             let packet = match packet::get_packet(&mut node.stream, &mut packet_id_buffer, &mut data_length_buffer) {
                 Ok(data) =>  {
                     println!("Retrieved data successfully");
@@ -83,6 +89,8 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
 
 pub fn disconnect_node(node: &mut Node, reason: DisconnectReason) {
+    node.connected = false;
+    
     let disconnect_packet = DisconnectNode {
         reason: i32::from(reason)
     };
