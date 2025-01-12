@@ -44,12 +44,12 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
                 let peer_address = match tcp_stream.peer_addr() {
                     Ok(addr) => addr.ip(),
                     Err(err) => {
-                        eprintln!("Failed to get peer address: ({err})");
+                        eprintln!("[GOV] [CLIENT] Failed to get peer address: ({err})");
                         continue;
                     }
                 };
 
-                println!("[GOV] Incoming connection from ({})", peer_address.to_string());
+                println!("[GOV] [CLIENT] Incoming connection from ({})", peer_address.to_string());
 
                 let client = Client {
                     stream: tcp_stream,
@@ -88,7 +88,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => data,
             Err(err) => {
-                println!("[GOV] Failed to get packet, ({:#?})", err);
+                println!("[GOV] [CLIENT] Failed to get packet, ({:#?})", err);
                 disconnect_client(&mut client, DisconnectReason::Crash);
                 return;
             }
@@ -109,7 +109,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
         let packet_handle = match known_packets.get(&packet.id) {
             Some(handler) => handler,
             None => {
-                println!("PacketID not found, ({})", packet.id);
+                println!("[GOV] [CLIENT] PacketID not found, ({})", packet.id);
                 continue;
             }
         };
@@ -121,7 +121,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
 }
 
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
-    println!("[GOV] Client disconnected, Reason: ({:#?})", reason);
+    println!("[GOV] [CLIENT] Client disconnected, Reason: ({:#?})", reason);
 
     client.connected = false;
 

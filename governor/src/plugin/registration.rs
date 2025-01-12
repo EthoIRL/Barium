@@ -64,7 +64,7 @@ impl GenericHandler<Client, GenericPacket> for ClientRegistration {
                 Ok(())
             },
             Err(err) => {
-                println!("Failed to authenticate client, (Reason: {:#?})", err);
+                println!("[GOV] [CLIENT] Failed to authenticate client, (Reason: {:#?})", err);
 
                 client::disconnect_client(client, match err {
                     RegistrationError::MismatchVersion {supplied_version} => DisconnectReason::MismatchVersion,

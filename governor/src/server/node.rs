@@ -24,12 +24,12 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mute
                 let peer_address = match tcp_stream.peer_addr() {
                     Ok(addr) => addr.ip(),
                     Err(err) => {
-                        eprintln!("Failed to get peer address: ({err})");
+                        eprintln!("[GOV] [NODE] Failed to get peer address: ({err})");
                         continue;
                     }
                 };
 
-                println!("[GOV] Incoming connection from ({})", peer_address.to_string());
+                println!("[GOV] [NODE] Incoming connection from ({})", peer_address.to_string());
 
                 let node = Arc::new(Mutex::new(Node {
                     stream: tcp_stream,
@@ -64,7 +64,7 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
             let packet = match packet::get_packet(&mut node.stream, &mut packet_id_buffer, &mut data_length_buffer) {
                 Ok(data) =>  {
-                    println!("Retrieved data successfully");
+                    println!("[GOV] [NODE] Retrieved data successfully");
                     data
                 },
                 Err(err) => {
@@ -74,12 +74,12 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
                 }
             };
 
-            println!("PACKET ID: {}", packet.id);
+            println!("[GOV] [NODE] PACKET ID: {}", packet.id);
 
             let packet_handle = match known_packets.get(&packet.id) {
                 Some(handler) => handler,
                 None => {
-                    println!("PacketID not found, ({})", packet.id);
+                    println!("[GOV] [NODE] PacketID not found, ({})", packet.id);
                     continue;
                 }
             };
@@ -93,6 +93,8 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
 
 
 pub fn disconnect_node(node: &mut Node, reason: DisconnectReason) {
+    println!("[GOV] [NODE] Node disconnected, Reason: ({:#?})", reason);
+
     node.connected = false;
     
     let disconnect_packet = DisconnectNode {
