@@ -10,10 +10,13 @@ mod proto;
 mod plugin;
 pub mod packet;
 mod anticheat;
+mod error;
 
 pub const API_VERSION: i32 = 0;
 const CLIENT_ADDRESS: (&str, u16) = ("127.0.0.1", 3238);
 const NODE_ADDRESS: (&str, u16) = ("127.0.0.1", 3349);
+
+const NODE_KEY: &str = "shared key";
 
 fn main() {
     println!("[GOV] Starting proxy server, {:?}", &CLIENT_ADDRESS);
