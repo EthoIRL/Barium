@@ -87,6 +87,8 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
             packet_handle(&mut node, packet).unwrap();
         };
     }
+
+    unreachable!()
 }
 
 

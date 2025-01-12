@@ -49,4 +49,6 @@ pub fn handle_response(stream: &mut TcpStream) -> Result<(), Error> {
 
         return Err(Error::new(ErrorKind::Other, "Failed to authenticate with governor server!"));
     }
+
+    unreachable!()
 }

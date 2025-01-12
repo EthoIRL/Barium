@@ -116,6 +116,8 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
 
         packet_handle(&mut client, packet).unwrap();
     }
+
+    unreachable!()
 }
 
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
