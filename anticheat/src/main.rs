@@ -1,3 +1,4 @@
+use std::net::TcpStream;
 use std::thread;
 use crate::node::mesh;
 
@@ -13,7 +14,11 @@ fn main() {
     println!("Hello, world!");
 
     for i in 0..2 {
-        thread::spawn(|| mesh::authed_connection(NODE_GOVERNOR, "shared key"));
+        thread::spawn(|| {
+            let mut stream = TcpStream::connect(NODE_GOVERNOR).unwrap();
+            mesh::authed_connection(&mut stream, "shared key").unwrap();
+            println!("Fully authenticated!!");
+        });
     }
 
     loop {}

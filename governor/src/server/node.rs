@@ -54,7 +54,7 @@ pub fn handle_node(mut node: Arc<Mutex<Node>>) {
     let mut data_length_buffer = [0u8; 4];
 
     let mut known_packets: HashMap<u16, fn(&mut Node, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
-    known_packets.insert(8, NodeRegistar::handle);
+    known_packets.insert(0, NodeRegistar::handle);
 
     loop {
         if let Ok(mut node) = node.lock() {
