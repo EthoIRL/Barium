@@ -6,11 +6,13 @@ use std::sync::{Arc, Mutex};
 use crate::anticheat::registration::NodeRegistar;
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::anticheat::DisconnectNode;
+use crate::proto::anticheat::{DisconnectNode, NodeResources};
 use crate::proto::generic::DisconnectReason;
 
 pub struct Node {
     pub stream: TcpStream,
+    pub resources: Option<NodeResources>,
+    pub connected: bool
 }
 
 pub fn start_node_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) -> Result<(), Error> {
