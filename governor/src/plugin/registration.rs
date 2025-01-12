@@ -1,47 +1,16 @@
-use std::{fmt, io};
+use std::io;
 use std::error::Error;
-use std::fmt::{Debug, Display, Formatter};
-use std::io::ErrorKind;
-
 use prost::Message;
 use uuid::Uuid;
 
 use crate::API_VERSION;
+use crate::error::RegistrationError;
 use crate::proto::server::server_registration::{Register, Response};
 use crate::server::client::{Client, Status};
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::generic::DisconnectReason;
 use crate::server::client;
-
-#[derive(Debug)]
-pub enum RegistrationError {
-    MismatchVersion { supplied_version: i32 },
-    BadResponse,
-    Unknown,
-}
-
-impl Display for RegistrationError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            RegistrationError::MismatchVersion { supplied_version} => {
-                write!(f, "version supplied from server client does not match governor version (Supplied: {}, Current: {})", supplied_version, API_VERSION)
-            },
-            RegistrationError::BadResponse => {
-                write!(f, "error occurred when sending registration response")
-            },
-            RegistrationError::Unknown => {
-                write!(f, "an unknown error occurred when handling registration")
-            }
-        }
-    }
-}
-
-impl Into<Box<dyn Error>> for RegistrationError {
-    fn into(self) -> Box<dyn Error> {
-        io::Error::new(ErrorKind::Other, self.to_string()).into()
-    }
-}
 
 pub fn verify_registration(packet: Vec<u8>) -> Result<Register, RegistrationError> {
     let register = match Register::decode(&*packet) {
