@@ -26,7 +26,7 @@ public final class Barium extends JavaPlugin {
         Log = getLogger();
         Server = getServer();
 
-        Remote = new Remote(Log);
+        Remote = new Remote(this, Log);
 
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();

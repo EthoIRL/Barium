@@ -21,12 +21,14 @@ public class StateHandler {
     private final OutputStream SocketOutput;
     private final InputStream SocketReceive;
     private final HashMap<Integer, AbstractState> stateHandlers = new HashMap<>();
+    private final Remote Remote;
 
     public StateHandler(PacketHandler packetHandler, OutputStream socketOutput, InputStream socketReceive, Logger log, Remote remote) {
         PacketHandler = packetHandler;
         SocketOutput = socketOutput;
         SocketReceive = socketReceive;
         Log = log;
+        Remote = remote;
 
         stateHandlers.put(1, new RegistrationHandler(1, packetHandler, log, this));
         stateHandlers.put(2, new DisconnectionHandler(2, packetHandler, log, remote, this));
@@ -56,7 +58,8 @@ public class StateHandler {
                 } catch (Exception ex) {
                     if (ex instanceof SocketException) {
                         State = Status.Crash;
-                        Log.severe("Socket connection to governor lost");
+                        Log.severe("Socket connection to governor lost!");
+                        Remote.Restart();
 
                         return;
                     } else {

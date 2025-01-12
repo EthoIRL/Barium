@@ -9,6 +9,7 @@ import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 import server.DisconnectServer;
 import server.ServerRegistration;
+import tech.strateim.barium.Barium;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
 import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
@@ -23,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Remote {
+    private final Barium Barium;
     private static Logger Log;
     private Socket Socket;
     private OutputStream SocketOutput;
@@ -31,11 +33,20 @@ public class Remote {
     private PacketHandler PacketHandler;
     private StateHandler StateHandler;
 
-    public Remote(Logger log) {
+    public Remote(Barium barium, Logger log) {
+        Barium = barium;
         Log = log;
     }
 
+    private String _address;
+    private int _port;
+    private PacketEventsAPI<?> _events;
+
     public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer, PacketEventsAPI<?> packetEvents) {
+        _address = governorAddress;
+        _port = governorPort;
+        _events = packetEvents;
+
         while (true) {
             try {
                 Socket = new Socket(governorAddress, governorPort);
@@ -78,6 +89,11 @@ public class Remote {
 
     public void Shutdown() {
         ExecutorService.shutdown();
+    }
+
+    public void Restart() {
+        Log.log(Level.WARNING, "Attempting to reestablish connection to remote governor!");
+        ExecutorService.execute(() -> Barium.PacketHandler = Start(_address, _port, Barium.getServer(), _events));
     }
 
     public void Disconnect(DisconnectReason reason) {
