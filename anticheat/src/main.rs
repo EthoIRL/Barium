@@ -1,5 +1,6 @@
 use std::net::TcpStream;
 use std::thread;
+use std::time::Duration;
 use crate::node::mesh;
 
 mod node;
@@ -18,6 +19,9 @@ fn main() {
             let mut stream = TcpStream::connect(NODE_GOVERNOR).unwrap();
             mesh::authed_connection(&mut stream, "shared key").unwrap();
             println!("Fully authenticated!!");
+            loop {
+                thread::sleep(Duration::from_millis(100))
+            }
         });
     }
 
