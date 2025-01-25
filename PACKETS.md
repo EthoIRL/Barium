@@ -1,25 +1,34 @@
 
-# Plugin
+# Plugin (CLIENT)
 
 ### ServerRegistration
-  - Register
+  - **Register** \
+    Indicates to the governor that a client would like to register within memory.
     - Id: 0
-  - Response
+  - **Response** \
+    Indicates to the client that the governor either accepted or denied the registration.
     - Id: 1
 
-### DisconnectServer
+### **DisconnectServer**
+Notifies the remote client that a forceful disconnection occurred on the governor side. \
+TcpStream connection will always be closed after calling this packet
   - Id: 2
 
-### Ready
+### **Ready**
+Indicates that the governor has successfully found a node for client-node communications. 
   - Id: 3
 
-# Anticheat
+# Anticheat (NODE)
 
 ### NodeRegistration
-  - Register
+  - **Register**
+    Indicates to the governor that a node would like to register within memory.
     - Id: 0
-  - Response
+  - **Response**
+    Indicates to the node that the governor either accepted or denied the registration
     - Id: 1
 
-### DisconnectNode
+### **DisconnectNode**
+Notifies the remote node that a forceful disconnection occurred on the governor side. \
+TcpStream connection will always be closed after calling this packet
   - Id: 2
