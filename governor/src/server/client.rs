@@ -29,6 +29,7 @@ pub struct Client {
 pub enum Status {
     Initialization,
     Registered,
+    Ready,
     Crash,
 }
 
