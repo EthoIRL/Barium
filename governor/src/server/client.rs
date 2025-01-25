@@ -4,12 +4,14 @@ use std::io::Error;
 use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
+use std::time::Duration;
 use uuid::Uuid;
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::plugin::disconnect::ClientDisconnect;
 use crate::plugin::registration::ClientRegistration;
 use crate::proto::generic::DisconnectReason;
+use crate::proto::server;
 use crate::proto::server::DisconnectServer;
 use crate::proto::server::server_registration::Register;
 use crate::server::node::Node;
@@ -23,6 +25,7 @@ pub struct Client {
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr,
     pub connected: bool,
+    pub node_stream: Option<TcpStream>
 }
 
 #[derive(PartialEq)]
@@ -58,7 +61,8 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
                     state: None,
                     key: None,
                     ip_addr: peer_address,
-                    connected: true
+                    connected: true,
+                    node_stream: None
                 };
 
                 let list = node_list.clone();
@@ -84,6 +88,47 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
     loop {
         if !client.connected {
             return;
+        }
+
+        if client.status == Status::Registered {
+            if let Ok(node_list) = node_list.lock() {
+                if node_list.is_empty() {
+                    thread::sleep(Duration::from_millis(1));
+                    continue;
+                }
+
+                // TODO: Pick node based on resources & current clients connected
+                let arc_node = match node_list.first() {
+                    Some(node) => node,
+                    None => continue
+                };
+
+                let local_node = match arc_node.lock() {
+                    Ok(node) => node,
+                    Err(_) => continue
+                };
+
+                let stream = match local_node.stream.try_clone() {
+                    Ok(stream) => stream,
+                    Err(err) => {
+                        println!("[GOV] [CLIENT] Failed to access node stream, ({:#?})", err);
+                        disconnect_client(&mut client, DisconnectReason::Crash);
+                        return;
+                    }
+                };
+
+                client.node_stream = Some(stream);
+
+                if let Err(err) = packet::send_packet(server::Ready::default(), 3, &mut client.stream) {
+                    println!("[GOV] [CLIENT] Failed to send ready packet, ({:#?})", err);
+                    disconnect_client(&mut client, DisconnectReason::Unknown);
+                    return;
+                };
+
+                println!("[GOV] [CLIENT] Client registered to anticheat server!");
+
+                client.status = Status::Ready;
+            }
         }
 
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
