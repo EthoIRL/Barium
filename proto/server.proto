@@ -24,3 +24,5 @@ message DisconnectServer {
   optional string UuidKey = 1;
   generic.DisconnectReason Reason = 2;
 }
+
+message Ready {}

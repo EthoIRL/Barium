@@ -1,22 +1,25 @@
 
-## Plugin
+# Plugin
 
-## ServerRegistration
+### ServerRegistration
   - Register
     - Id: 0
   - Response
     - Id: 1
 
-## DisconnectServer
+### DisconnectServer
   - Id: 2
 
-## Anticheat
+### Ready
+  - Id: 3
 
-## NodeRegistration
+# Anticheat
+
+### NodeRegistration
   - Register
     - Id: 0
   - Response
     - Id: 1
 
-## DisconnectNode
+### DisconnectNode
   - Id: 2
