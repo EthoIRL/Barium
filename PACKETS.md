@@ -18,6 +18,10 @@ TcpStream connection will always be closed after calling this packet
 Indicates that the governor has successfully found a node for client-node communications. 
   - Id: 3
 
+### **ProxyMessage**
+Proto message within a message intended to be sent to the client corresponding node.
+  - Id: 4
+
 # Anticheat (NODE)
 
 ### NodeRegistration
