@@ -131,7 +131,20 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
         }
 
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
-            Ok(data) => data,
+            Ok(data) => {
+                if client.status == Status::Ready {
+                    assert!(client.node_id.is_some(), "[GOV] [CLIENT] Client does not have node id tied to client after Ready status!");
+
+                    if let Ok(node_list) = node_list.read() {
+                        if !node_list.contains_key(&client.node_id.unwrap()) {
+                            println!("[GOV] [CLIENT] Node no longer exists; disconnecting client");
+                            return;
+                        }
+                    }
+                }
+
+                data
+            },
             Err(err) => {
                 println!("[GOV] [CLIENT] Failed to get packet, ({:#?})", err);
                 disconnect_client(&mut client, DisconnectReason::Crash);
