@@ -28,7 +28,15 @@ public class PacketHandler {
         SendLock = new ReentrantLock();
     }
 
-    public void SendPacket(GeneratedMessageV3 packet, int id) {
+    public void SendPacket(GeneratedMessageV3 packet, int id) throws Exception {
+        byte[] data = packet.toByteArray();
+        byte[] packetId = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)id).array();
+        byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
+
+        WritePacketBlocking(packetId, dataLength, data);
+    }
+
+    public void SendPacketRetry(GeneratedMessageV3 packet, int id) {
         byte[] data = packet.toByteArray();
         byte[] packetId = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)id).array();
         byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
@@ -43,7 +51,6 @@ public class PacketHandler {
             SendPacketRetry(packetId, dataLength, data);
         }
     }
-
 
     private void SendPacketRetry(byte[] packetId, byte[] dataLength, byte[] data) {
         byte recursed = 0;

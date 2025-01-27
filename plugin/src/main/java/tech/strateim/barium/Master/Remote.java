@@ -104,7 +104,7 @@ public class Remote {
             disconnectBuilder.setUuidKey(StateHandler.Key);
         }
 
-        PacketHandler.SendPacket(disconnectBuilder.build(), 2);
+        PacketHandler.SendPacketRetry(disconnectBuilder.build(), 2);
     }
 
     private void InitRegistration(Server localServer, PacketEventsAPI<?> packetEvents) {
@@ -125,6 +125,6 @@ public class Remote {
                 .setProtocol(protocolBuilder)
                 .build();
 
-        PacketHandler.SendPacket(register, 0);
+        PacketHandler.SendPacketRetry(register, 0);
     }
 }
