@@ -1,6 +1,8 @@
-use std::sync::{Arc, Mutex};
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
+use uuid::Uuid;
 
 use crate::server::{client, node};
 use crate::server::node::Node;
@@ -22,7 +24,7 @@ fn main() {
     println!("[GOV] Starting proxy server, {:?}", &CLIENT_ADDRESS);
     println!("[GOV] Starting node server, {:?}", &NODE_ADDRESS);
 
-    let nodes: Arc<Mutex<Vec<Arc<Mutex<Node>>>>> = Arc::new(Mutex::new(Vec::new()));
+    let nodes: Arc<RwLock<HashMap<Uuid, Arc<Node>>>> = Arc::new(RwLock::new(HashMap::new()));
 
     if let Err(err) = node::start_node_server(NODE_ADDRESS, nodes.clone()) {
         eprintln!("[GOV] Failed to start node server, ({})", err);

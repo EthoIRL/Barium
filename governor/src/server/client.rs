@@ -2,7 +2,7 @@ use std::{thread, u16};
 use std::collections::HashMap;
 use std::io::Error;
 use std::net::{IpAddr, TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use std::thread::JoinHandle;
 use std::time::Duration;
 use uuid::Uuid;
@@ -25,7 +25,8 @@ pub struct Client {
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr,
     pub connected: bool,
-    pub node_stream: Option<TcpStream>
+    pub node_stream: Option<TcpStream>,
+    pub node_id: Option<Uuid>
 }
 
 #[derive(PartialEq)]
@@ -36,7 +37,7 @@ pub enum Status {
     Crash,
 }
 
-pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
+pub fn start_plugin_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
     let listener = TcpListener::bind(address)?;
 
     let thread_pool: Arc<Mutex<Vec<JoinHandle<()>>>> = Arc::new(Mutex::new(Vec::new()));
@@ -62,7 +63,8 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
                     key: None,
                     ip_addr: peer_address,
                     connected: true,
-                    node_stream: None
+                    node_stream: None,
+                    node_id: None
                 };
 
                 let list = node_list.clone();
@@ -77,7 +79,7 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<Mutex<Vec<Arc<Mu
     Ok(thread_pool)
 }
 
-pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node>>>>>) {
+pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
@@ -91,24 +93,20 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
         }
 
         if client.status == Status::Registered {
-            if let Ok(node_list) = node_list.lock() {
+            if let Ok(node_list) = node_list.read() {
                 if node_list.is_empty() {
                     thread::sleep(Duration::from_millis(1));
                     continue;
                 }
 
                 // TODO: Pick node based on resources & current clients connected
-                let arc_node = match node_list.first() {
-                    Some(node) => node,
+
+                let node = match node_list.iter().next() {
+                    Some(node) => node.1,
                     None => continue
                 };
 
-                let local_node = match arc_node.lock() {
-                    Ok(node) => node,
-                    Err(_) => continue
-                };
-
-                let stream = match local_node.stream.try_clone() {
+                let stream = match node.stream.try_clone() {
                     Ok(stream) => stream,
                     Err(err) => {
                         println!("[GOV] [CLIENT] Failed to access node stream, ({:#?})", err);
@@ -118,6 +116,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<Mutex<Vec<Arc<Mutex<Node
                 };
 
                 client.node_stream = Some(stream);
+                client.node_id = Some(node.id);
 
                 if let Err(err) = packet::send_packet(server::Ready::default(), 3, &mut client.stream) {
                     println!("[GOV] [CLIENT] Failed to send ready packet, ({:#?})", err);
