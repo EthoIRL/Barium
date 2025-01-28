@@ -1,7 +1,7 @@
 use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
-use crate::node::mesh;
+use crate::node::{auth, connection};
 
 mod node;
 mod packet;
@@ -14,16 +14,7 @@ const NODE_GOVERNOR: (&str, u16) = ("127.0.0.1", 3349);
 fn main() {
     println!("Hello, world!");
 
-    for i in 0..2 {
-        thread::spawn(|| {
-            let mut stream = TcpStream::connect(NODE_GOVERNOR).unwrap();
-            mesh::authed_connection(&mut stream, "shared key").unwrap();
-            println!("Fully authenticated!!");
-            loop {
-                thread::sleep(Duration::from_millis(100))
-            }
-        });
-    }
-
-    loop {}
+    let mut stream = TcpStream::connect(NODE_GOVERNOR).unwrap();
+    auth::authed_connection(&mut stream, "shared key").unwrap();
+    connection::handle_response(&mut stream).unwrap();
 }
