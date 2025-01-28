@@ -15,7 +15,7 @@ use crate::proto::generic::DisconnectReason;
 use crate::proto::server;
 use crate::proto::server::DisconnectServer;
 use crate::proto::server::server_registration::Register;
-use crate::server::node::Node;
+use crate::server::node::{Node, NodeStatus};
 
 pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
@@ -102,10 +102,19 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                 }
 
                 // TODO: Pick node based on resources & current clients connected
-
-                let node = match node_list.iter().next() {
+                let node = match node_list.iter().find(|(uuid, node)| {
+                    if let Ok(status) = node.status.read() {
+                        if *status == NodeStatus::Ready {
+                            return true;
+                        }
+                    }
+                    false
+                }) {
                     Some(node) => node.1,
-                    None => continue
+                    None => {
+                        thread::sleep(Duration::from_millis(1));
+                        continue
+                    }
                 };
 
                 let stream = match node.stream.try_clone() {

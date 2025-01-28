@@ -15,7 +15,14 @@ pub struct Node {
     pub resources: Arc<Mutex<Option<NodeResources>>>,
     pub connected: Arc<RwLock<bool>>,
     pub id: Uuid,
-    pub ip_addr: IpAddr
+    pub ip_addr: IpAddr,
+    pub status: Arc<RwLock<NodeStatus>>
+}
+
+#[derive(PartialEq)]
+pub enum NodeStatus {
+    Authenticating,
+    Ready,
 }
 
 pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<(), Error> {
@@ -41,7 +48,8 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uui
                     resources: Arc::new(Mutex::new(None)),
                     connected: Arc::new(RwLock::new(true)),
                     id: node_id.clone(),
-                    ip_addr: peer_address
+                    ip_addr: peer_address,
+                    status: Arc::new(RwLock::new(NodeStatus::Authenticating))
                 });
 
                 let node_clone = node.clone();

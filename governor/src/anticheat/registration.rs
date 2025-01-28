@@ -5,7 +5,7 @@ use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration;
 use crate::proto::generic::DisconnectReason;
 use crate::server::node;
-use crate::server::node::Node;
+use crate::server::node::{Node, NodeStatus};
 
 pub struct NodeRegistar;
 
@@ -30,13 +30,17 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
             node::disconnect_node(node, DisconnectReason::Unknown);
             return Err(err.into());
         };
-        
+
         match shared_key_status {
             true => {
                 println!("[GOV] [NODE] Authenticated node ({}, {})", node.ip_addr.to_string(), node.id.to_string());
-                
+
                 if let Ok(mut resources) = node.resources.lock() {
                     *resources = registration_packet.resources;
+                }
+
+                if let Ok(mut status) = node.status.write() {
+                    *status = NodeStatus::Ready;
                 }
             },
             false => {
