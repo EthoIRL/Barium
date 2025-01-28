@@ -21,7 +21,7 @@ pub const MAXIMUM_PACKET_SIZE: usize = 2048;
 
 pub struct Client {
     pub stream: TcpStream,
-    pub status: Status,
+    pub status: ClientStatus,
     pub state: Option<Register>,
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr,
@@ -31,7 +31,7 @@ pub struct Client {
 }
 
 #[derive(PartialEq)]
-pub enum Status {
+pub enum ClientStatus {
     Initialization,
     Registered,
     Ready,
@@ -59,7 +59,7 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<U
 
                 let client = Client {
                     stream: tcp_stream,
-                    status: Status::Initialization,
+                    status: ClientStatus::Initialization,
                     state: None,
                     key: None,
                     ip_addr: peer_address,
@@ -94,7 +94,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
             return;
         }
 
-        if client.status == Status::Registered {
+        if client.status == ClientStatus::Registered {
             if let Ok(node_list) = node_list.read() {
                 if node_list.is_empty() {
                     thread::sleep(Duration::from_millis(1));
@@ -137,13 +137,13 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
 
                 println!("[GOV] [CLIENT] Client registered to anticheat server! ({}, {})", client.ip_addr.to_string(), node.id.to_string());
 
-                client.status = Status::Ready;
+                client.status = ClientStatus::Ready;
             }
         }
 
         let packet = match packet::get_packet(&mut client.stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => {
-                if client.status == Status::Ready {
+                if client.status == ClientStatus::Ready {
                     assert!(client.node_id.is_some(), "[GOV] [CLIENT] Client does not have node id tied to client after Ready status!");
 
                     if let Ok(node_list) = node_list.read() {
@@ -168,7 +168,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
             return;
         }
 
-        if client.status == Status::Initialization {
+        if client.status == ClientStatus::Initialization {
             if packet.id != 0 {
                 disconnect_client(&mut client, DisconnectReason::Unknown);
                 return;

@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::server::DisconnectServer;
 use crate::server::client;
-use crate::server::client::{Client, Status};
+use crate::server::client::{Client, ClientStatus};
 
 pub struct ClientDisconnect;
 
@@ -11,7 +11,7 @@ impl GenericHandler<Client, GenericPacket> for ClientDisconnect {
     fn handle(client: &mut Client, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         let disconnect_packet = packet.decode::<DisconnectServer>()?;
         
-        if client.status == Status::Initialization {
+        if client.status == ClientStatus::Initialization {
             client::disconnect_client(client, disconnect_packet.reason());
             return Ok(());
         }

@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::API_VERSION;
 use crate::error::RegistrationError;
 use crate::proto::server::server_registration::{Register, Response};
-use crate::server::client::{Client, Status};
+use crate::server::client::{Client, ClientStatus};
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::generic::DisconnectReason;
@@ -57,7 +57,7 @@ impl GenericHandler<Client, GenericPacket> for ClientRegistration {
         return match result {
             Ok(register) => {
                 client.state = Some(register);
-                client.status = Status::Registered;
+                client.status = ClientStatus::Registered;
                 client.key = Some(key);
 
                 println!("[GOV] [CLIENT] Client connection accepted ({}, {})", client.ip_addr.to_string(), key.to_string());
