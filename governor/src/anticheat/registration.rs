@@ -20,23 +20,27 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
             }.into());
         }
 
-        if registration_packet.shared_key != NODE_KEY {
-            node::disconnect_node(node, DisconnectReason::Unknown);
-            return Err(RegistrationError::BadResponse.into());
-        }
-
-        if let Ok(mut resources) = node.resources.lock() {
-            *resources = registration_packet.resources;
-        }
+        let shared_key_status = registration_packet.shared_key == NODE_KEY;
 
         let response = node_registration::Response {
-            succeeded: true,
+            succeeded: shared_key_status,
         };
 
         if let Err(err) = packet::send_packet(response, 1, &mut node.stream.try_clone().unwrap()) {
             node::disconnect_node(node, DisconnectReason::Unknown);
             return Err(err.into());
         };
+        
+        match shared_key_status {
+            true => {
+                if let Ok(mut resources) = node.resources.lock() {
+                    *resources = registration_packet.resources;
+                }
+            },
+            false => {
+                node::disconnect_node(node, DisconnectReason::Unknown);
+            }
+        }
 
         Ok(())
     }
