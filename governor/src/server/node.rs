@@ -1,7 +1,7 @@
 use std::{thread, u16};
 use std::collections::HashMap;
 use std::io::Error;
-use std::net::{TcpListener, TcpStream};
+use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, RwLock};
 use uuid::Uuid;
 use crate::anticheat::registration::NodeRegistar;
@@ -14,7 +14,8 @@ pub struct Node {
     pub stream: TcpStream,
     pub resources: Arc<Mutex<Option<NodeResources>>>,
     pub connected: Arc<RwLock<bool>>,
-    pub id: Uuid
+    pub id: Uuid,
+    pub ip_addr: IpAddr
 }
 
 pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<(), Error> {
@@ -39,7 +40,8 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uui
                     stream: tcp_stream.try_clone().unwrap(),
                     resources: Arc::new(Mutex::new(None)),
                     connected: Arc::new(RwLock::new(true)),
-                    id: node_id.clone()
+                    id: node_id.clone(),
+                    ip_addr: peer_address
                 });
 
                 let node_clone = node.clone();
@@ -80,11 +82,10 @@ pub fn handle_node(mut tcp_stream: TcpStream, mut node: Arc<Node>, node_list: Ar
 
         let packet = match packet::get_packet(&mut tcp_stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => {
-                println!("[GOV] [NODE] Retrieved data successfully");
                 data
             }
             Err(err) => {
-                println!("[GOV] Failed to get packet, ({:#?})", err);
+                println!("[GOV] [NODE] Failed to get packet, ({:#?})", err);
                 disconnect_node(&mut node, DisconnectReason::Crash);
 
                 if let Ok(mut node_list) = node_list.write() {
@@ -94,8 +95,6 @@ pub fn handle_node(mut tcp_stream: TcpStream, mut node: Arc<Node>, node_list: Ar
                 return;
             }
         };
-
-        println!("[GOV] [NODE] PACKET ID: {}", packet.id);
 
         let packet_handle = match known_packets.get(&packet.id) {
             Some(handler) => handler,

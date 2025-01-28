@@ -33,6 +33,8 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
         
         match shared_key_status {
             true => {
+                println!("[GOV] [NODE] Authenticated node ({}, {})", node.ip_addr.to_string(), node.id.to_string());
+                
                 if let Ok(mut resources) = node.resources.lock() {
                     *resources = registration_packet.resources;
                 }

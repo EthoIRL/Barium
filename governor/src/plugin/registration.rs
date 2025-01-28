@@ -60,7 +60,7 @@ impl GenericHandler<Client, GenericPacket> for ClientRegistration {
                 client.status = Status::Registered;
                 client.key = Some(key);
 
-                println!("{:#?}", register);
+                println!("[GOV] [CLIENT] Client connection accepted ({}, {})", client.ip_addr.to_string(), key.to_string());
                 Ok(())
             },
             Err(err) => {

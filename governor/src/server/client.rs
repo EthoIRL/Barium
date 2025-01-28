@@ -126,7 +126,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                     return;
                 };
 
-                println!("[GOV] [CLIENT] Client registered to anticheat server!");
+                println!("[GOV] [CLIENT] Client registered to anticheat server! ({}, {})", client.ip_addr.to_string(), node.id.to_string());
 
                 client.status = Status::Ready;
             }
