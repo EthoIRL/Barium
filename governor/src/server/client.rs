@@ -5,12 +5,15 @@ use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread::JoinHandle;
 use std::time::Duration;
+
 use uuid::Uuid;
+
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::plugin::disconnect::ClientDisconnect;
 use crate::plugin::proxy::ClientProxy;
 use crate::plugin::registration::ClientRegistration;
+use crate::proto::anticheat::NodeProxyNegotiation;
 use crate::proto::generic::DisconnectReason;
 use crate::proto::server;
 use crate::proto::server::DisconnectServer;
@@ -27,7 +30,7 @@ pub struct Client {
     pub ip_addr: IpAddr,
     pub connected: bool,
     pub node_stream: Option<TcpStream>,
-    pub node_id: Option<Uuid>
+    pub node_id: Option<Uuid>,
 }
 
 #[derive(PartialEq)]
@@ -65,7 +68,7 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<U
                     ip_addr: peer_address,
                     connected: true,
                     node_stream: None,
-                    node_id: None
+                    node_id: None,
                 };
 
                 let list = node_list.clone();
@@ -113,31 +116,14 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                     Some(node) => node.1,
                     None => {
                         thread::sleep(Duration::from_millis(1));
-                        continue
+                        continue;
                     }
                 };
 
-                let stream = match node.stream.try_clone() {
-                    Ok(stream) => stream,
-                    Err(err) => {
-                        println!("[GOV] [CLIENT] Failed to access node stream, ({:#?})", err);
-                        disconnect_client(&mut client, DisconnectReason::Crash);
-                        return;
-                    }
-                };
-
-                client.node_stream = Some(stream);
-                client.node_id = Some(node.id);
-
-                if let Err(err) = packet::send_packet(server::Ready::default(), 3, &mut client.stream) {
-                    println!("[GOV] [CLIENT] Failed to send ready packet, ({:#?})", err);
-                    disconnect_client(&mut client, DisconnectReason::Unknown);
-                    return;
-                };
-
-                println!("[GOV] [CLIENT] Client registered to anticheat server! ({}, {})", client.ip_addr.to_string(), node.id.to_string());
-
-                client.status = ClientStatus::Ready;
+                if let Err(err) = negotiate_node_registration(node, &mut client) {
+                    println!("[GOV] [CLIENT] {err}");
+                    disconnect_client(&mut client, DisconnectReason::Crash);
+                }
             }
         }
 
@@ -155,7 +141,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                 }
 
                 data
-            },
+            }
             Err(err) => {
                 println!("[GOV] [CLIENT] Failed to get packet, ({:#?})", err);
                 disconnect_client(&mut client, DisconnectReason::Crash);
@@ -187,6 +173,60 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
     }
 
     unreachable!()
+}
+
+pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Result<(), Box<dyn std::error::Error>> {
+    let mut origin_stream = match node.origin_stream.try_clone() {
+        Ok(stream) => stream,
+        Err(err) => {
+            return Err(format!("Failed to access node stream, ({:#?})", err).into());
+        }
+    };
+
+    let listener = match TcpListener::bind("127.0.0.1:0") {
+        Ok(listener) => listener,
+        Err(err) => {
+            return Err(format!("Failed to create proxy listener, ({:#?})", err).into());
+        }
+    };
+
+    let stream_port = match listener.local_addr() {
+        Ok(local_addr) => local_addr.port() as u32,
+        Err(err) => {
+            return Err(format!("Failed to retrieve port from proxy listener, ({:#?})", err).into());
+        }
+    };
+
+    assert!(client.key.is_some(), "Client key is empty past registration phase.");
+
+    let proxy_negotiation = NodeProxyNegotiation {
+        port: stream_port,
+        client_key: client.key.unwrap().to_string(),
+    };
+
+    if let Err(err) = packet::send_packet(proxy_negotiation, 3, &mut origin_stream) {
+        return Err(format!("Failed to send packet to origin node stream, ({:#?})", err).into());
+    };
+
+    let proxy_connection = match listener.accept() {
+        Ok(listener) => listener.0,
+        Err(err) => {
+            return Err(format!("Node failed to connect to client proxy stream, ({:#?})", err).into());
+        }
+    };
+
+    client.node_stream = Some(proxy_connection);
+    client.node_id = Some(node.id);
+
+    if let Err(err) = packet::send_packet(server::Ready::default(), 3, &mut client.stream) {
+        return Err(format!("Failed to send ready packet, ({:#?})", err).into());
+    };
+
+    println!("Client registered to anticheat server! ({}, {})", client.ip_addr.to_string(), node.id.to_string());
+
+    client.status = ClientStatus::Ready;
+
+    Ok(())
 }
 
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
