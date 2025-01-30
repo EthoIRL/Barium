@@ -26,7 +26,7 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
             succeeded: shared_key_status,
         };
 
-        if let Err(err) = packet::send_packet(response, 1, &mut node.stream.try_clone().unwrap()) {
+        if let Err(err) = packet::send_packet(response, 1, &mut node.origin_stream.try_clone().unwrap()) {
             node::disconnect_node(node, DisconnectReason::Unknown);
             return Err(err.into());
         };

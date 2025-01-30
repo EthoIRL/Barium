@@ -11,7 +11,7 @@ use crate::proto::anticheat::{DisconnectNode, NodeResources};
 use crate::proto::generic::DisconnectReason;
 
 pub struct Node {
-    pub stream: TcpStream,
+    pub origin_stream: TcpStream,
     pub resources: Arc<Mutex<Option<NodeResources>>>,
     pub connected: Arc<RwLock<bool>>,
     pub id: Uuid,
@@ -44,7 +44,7 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uui
                 let node_id = Uuid::new_v4();
 
                 let node = Arc::new(Node {
-                    stream: tcp_stream.try_clone().unwrap(),
+                    origin_stream: tcp_stream.try_clone().unwrap(),
                     resources: Arc::new(Mutex::new(None)),
                     connected: Arc::new(RwLock::new(true)),
                     id: node_id.clone(),
@@ -138,5 +138,5 @@ pub fn disconnect_node(node: &mut Arc<Node>, reason: DisconnectReason) {
         reason: i32::from(reason)
     };
 
-    let _ = packet::send_packet(disconnect_packet, 2, &mut node.stream.try_clone().unwrap());
+    let _ = packet::send_packet(disconnect_packet, 2, &mut node.origin_stream.try_clone().unwrap());
 }
