@@ -36,3 +36,7 @@ Proto message within a message intended to be sent to the client corresponding n
 Notifies the remote node that a forceful disconnection occurred on the governor side. \
 TcpStream connection will always be closed after calling this packet
   - Id: 2
+
+### **NodeProxyNegotiation**
+Notifies the node that it should connect to a reverse proxy connection provided by the governor
+  - Id: 3

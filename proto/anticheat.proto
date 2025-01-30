@@ -31,3 +31,8 @@ message NodeResources {
 message DisconnectNode {
   generic.DisconnectReason Reason = 1;
 }
+
+message NodeProxyNegotiation {
+  uint32 Port = 1;
+  string ClientKey = 2;
+}
