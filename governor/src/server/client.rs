@@ -1,6 +1,7 @@
 use std::{thread, u16};
 use std::collections::HashMap;
 use std::io::Error;
+use std::io::ErrorKind::ConnectionReset;
 use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread::JoinHandle;
@@ -28,7 +29,7 @@ pub struct Client {
     pub state: Option<Register>,
     pub key: Option<Uuid>,
     pub ip_addr: IpAddr,
-    pub connected: bool,
+    pub connected: Arc<RwLock<bool>>,
     pub node_stream: Option<TcpStream>,
     pub node_id: Option<Uuid>,
 }
@@ -66,7 +67,7 @@ pub fn start_plugin_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<U
                     state: None,
                     key: None,
                     ip_addr: peer_address,
-                    connected: true,
+                    connected: Arc::new(RwLock::new(true)),
                     node_stream: None,
                     node_id: None,
                 };
@@ -93,8 +94,10 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
     known_packets.insert(10, ClientProxy::handle);
 
     loop {
-        if !client.connected {
-            return;
+        if let Ok(connection) = client.connected.read() {
+            if !*connection {
+                return;
+            }
         }
 
         if client.status == ClientStatus::Registered {
@@ -232,7 +235,9 @@ pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Res
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
     println!("[GOV] [CLIENT] Client disconnected, Reason: ({:#?})", reason);
 
-    client.connected = false;
+    if let Ok(mut connection) = client.connected.write() {
+        *connection = false;
+    }
 
     let disconnect_packet = DisconnectServer {
         uuid_key: match client.key {
