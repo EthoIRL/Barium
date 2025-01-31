@@ -217,6 +217,8 @@ pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Res
             return Err(format!("Node failed to connect to client proxy stream, ({:#?})", err).into());
         }
     };
+    
+    node_client_relay(client.connected.clone(), proxy_connection.try_clone()?, client.stream.try_clone()?);
 
     client.node_stream = Some(proxy_connection);
     client.node_id = Some(node.id);
@@ -230,6 +232,44 @@ pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Res
     client.status = ClientStatus::Ready;
 
     Ok(())
+}
+
+pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: TcpStream, mut client_stream: TcpStream) {
+    thread::spawn(move || {
+        let mut packet_id_buffer = [0u8; 2];
+        let mut data_length_buffer = [0u8; 4];
+
+        loop {
+            if let Ok(connection) = client_connection.read() {
+                if !*connection {
+                    return;
+                }
+            }
+
+            let packet = match packet::get_packet(&mut node_stream, &mut packet_id_buffer, &mut data_length_buffer) {
+                Ok(data) => data,
+                Err(err) => {
+                    if err.kind() != ConnectionReset {
+                        println!("[GOV] [NODE]-[CLIENT] Failed to get packet, ({:#?})", err);
+                    }
+                    return;
+                }
+            };
+
+            if packet.id != 10 {
+                println!("[GOV] [NODE]-[CLIENT] Packet is not a proxy packet! (ID: {})", packet.id);
+                continue;
+            }
+
+            if let Err(err) = packet::send_packet(packet.data, 10, &mut client_stream) {
+                if err.kind() != ConnectionReset {
+                    println!("[GOV] [NODE]-[CLIENT] Failed to send packet to the client, ({:#?})", err);
+                }
+
+                return;
+            };
+        }
+    });
 }
 
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
