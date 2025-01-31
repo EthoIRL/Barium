@@ -1,6 +1,7 @@
 use std::{thread, u16};
 use std::collections::HashMap;
 use std::io::Error;
+use std::io::ErrorKind::ConnectionReset;
 use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, RwLock};
 use uuid::Uuid;
@@ -93,7 +94,13 @@ pub fn handle_node(mut tcp_stream: TcpStream, mut node: Arc<Node>, node_list: Ar
                 data
             }
             Err(err) => {
-                println!("[GOV] [NODE] Failed to get packet, ({:#?})", err);
+                let err_message = match err.kind() {
+                    ConnectionReset => "[GOV] [NODE] Remote connection abruptly dropped",
+                    _ => &*format!("[GOV] [NODE] Failed to get packet, ({:#?})", err)
+                };
+
+                println!("{}", err_message);
+
                 disconnect_node(&mut node, DisconnectReason::Crash);
 
                 if let Ok(mut node_list) = node_list.write() {
