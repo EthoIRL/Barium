@@ -20,7 +20,7 @@ Indicates that the governor has successfully found a node for client-node commun
 
 ### **ProxyMessage**
 Proto message within a message intended to be sent to the client corresponding node.
-  - Id: 4
+  - Id: 10
 
 # Anticheat (NODE)
 
@@ -40,3 +40,7 @@ TcpStream connection will always be closed after calling this packet
 ### **NodeProxyNegotiation**
 Notifies the node that it should connect to a reverse proxy connection provided by the governor
   - Id: 3
+
+### **ProxyMessage**
+Proto message within a message intended to be sent to the node corresponding client.
+  - Id: 10

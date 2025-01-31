@@ -90,7 +90,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
     let mut known_packets: HashMap<u16, fn(&mut Client, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
     known_packets.insert(0, ClientRegistration::handle);
     known_packets.insert(2, ClientDisconnect::handle);
-    known_packets.insert(4, ClientProxy::handle);
+    known_packets.insert(10, ClientProxy::handle);
 
     loop {
         if !client.connected {
