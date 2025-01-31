@@ -1,6 +1,4 @@
 use std::net::TcpStream;
-use std::thread;
-use std::time::Duration;
 use crate::node::{auth, connection};
 
 mod node;
@@ -16,5 +14,7 @@ fn main() {
 
     let mut stream = TcpStream::connect(NODE_GOVERNOR).unwrap();
     auth::authed_connection(&mut stream, "shared key").unwrap();
-    connection::handle_response(&mut stream).unwrap();
+    connection::handle_registration(&mut stream).unwrap();
+    
+    connection::start_client_server(NODE_GOVERNOR, &mut stream);
 }

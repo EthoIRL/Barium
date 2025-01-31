@@ -1,36 +1,87 @@
 use std::io::{Error, ErrorKind};
 use std::net::TcpStream;
+use std::thread;
 use prost::Message;
 
 use crate::packet;
 use crate::proto::anticheat::node_registration::Response;
+use crate::proto::anticheat::NodeProxyNegotiation;
 
-pub fn handle_response(stream: &mut TcpStream) -> Result<(), Error> {
+pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
     loop {
         let packet = match packet::get_packet(stream, &mut packet_id_buffer, &mut data_length_buffer) {
-            Ok(data) => {
-                data
-            }
+            Ok(data) => data,
             Err(err) => {
                 return Err(err);
             }
         };
 
-        if packet.id == 1 {
-            let response = Response::decode(&*packet.data)?;
-
-            if !response.succeeded {
-                return Err(Error::new(ErrorKind::Other, "Failed to authenticate with governor server!"));
-            }
-        }
+        assert_eq!(packet.id, 1, "Unknown packet received during registration response phase");
 
         if packet.id != 1 {
-            println!("ID: {}", packet.id);
+            return Err(Error::new(ErrorKind::Other, format!("Unknown packet received during registration response phase, ({})", packet.id)));
         }
+
+        let response = Response::decode(&*packet.data)?;
+
+        if response.succeeded {
+            return Ok(());
+        }
+
+        return Err(Error::new(ErrorKind::Other, "Failed to authenticate with governor server!"));
     }
 
     unreachable!()
+}
+
+pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream) {
+    let mut packet_id_buffer = [0u8; 2];
+    let mut data_length_buffer = [0u8; 4];
+
+    loop {
+        let packet = match packet::get_packet(stream, &mut packet_id_buffer, &mut data_length_buffer) {
+            Ok(data) => data,
+            Err(err) => {
+                println!("[NODE] [GOVERNOR] Failed to retrieve packet from governor. ({err})");
+                return;
+            }
+        };
+
+        if packet.id != 3 {
+            println!("[NODE] [GOVERNOR] Unknown packet received (ID: {})", packet.id);
+            continue;
+        }
+
+        let negotiation = match NodeProxyNegotiation::decode(&*packet.data) {
+            Ok(packet) => packet,
+            Err(err) => {
+                println!("[NODE] [GOVERNOR] Failed to decode packet. ({err})");
+                continue;
+            }
+        };
+
+        let remote_address = governor_address.0.to_string();
+
+        thread::spawn(move || {
+            let mut connection = TcpStream::connect((remote_address.as_str(), negotiation.port as u16)).unwrap();
+
+            let mut packet_id_buffer = [0u8; 2];
+            let mut data_length_buffer = [0u8; 4];
+
+            loop {
+                let packet = match packet::get_packet(&mut connection, &mut packet_id_buffer, &mut data_length_buffer) {
+                    Ok(data) => data,
+                    Err(err) => {
+                        println!("[NODE] [GOVERNOR]-[CLIENT] Unknown packet received ({err})");
+                        break;
+                    }
+                };
+
+                println!("Packet ID received from proxy connection: {}", packet.id);
+            }
+        });
+    }
 }
