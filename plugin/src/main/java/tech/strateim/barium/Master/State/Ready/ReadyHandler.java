@@ -1,5 +1,7 @@
 package tech.strateim.barium.Master.State.Ready;
 
+import server.ProxyMessage;
+import server.ServerRegistration;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
@@ -22,6 +24,16 @@ public class ReadyHandler extends AbstractState {
         stateHandler.State = Status.Ready;
 
         log.warning("READY TO SEND");
+
+        while(true) {
+            ProxyMessage message = ProxyMessage.newBuilder()
+                    .build();
+
+            packetHandler.SendPacket(message, 10);
+
+            Thread.sleep(500);
+        }
+
         // TODO: Begin sending packets to anticheat
         // TODO: Register all connected players with anticheat
     }
