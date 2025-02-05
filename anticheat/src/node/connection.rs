@@ -80,7 +80,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
                     }
                 };
 
-                println!("Packet ID received from proxy connection: {}", packet.id);
+                println!("[NODE] [GOVERNOR]-[CLIENT] Received from proxy connection (Id: {})", proxy_packet.id);
             }
         });
     }
