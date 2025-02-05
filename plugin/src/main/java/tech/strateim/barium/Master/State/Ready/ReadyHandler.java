@@ -1,5 +1,6 @@
 package tech.strateim.barium.Master.State.Ready;
 
+import generic.Protocol;
 import server.ProxyMessage;
 import server.ServerRegistration;
 import tech.strateim.barium.Master.Enum.Status;
@@ -26,10 +27,14 @@ public class ReadyHandler extends AbstractState {
         log.warning("READY TO SEND");
 
         while(true) {
-            ProxyMessage message = ProxyMessage.newBuilder()
+            Protocol protocol = Protocol.newBuilder()
+                    .setGeyser(true)
+                    .setViaBackwards(false)
+                    .setViaRewind(true)
+                    .setViaVersion(false)
                     .build();
 
-            packetHandler.SendPacket(message, 10);
+            packetHandler.SendPacket(protocol, 200, stateHandler.State);
 
             Thread.sleep(500);
         }
