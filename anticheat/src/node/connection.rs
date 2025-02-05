@@ -1,7 +1,11 @@
+use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::net::TcpStream;
+use std::sync::{Arc, RwLock};
 use std::thread;
 use prost::Message;
+use uuid::Uuid;
+use crate::client::game::GameServer;
 
 use crate::packet;
 use crate::proto::anticheat::node_registration::Response;
@@ -37,7 +41,7 @@ pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     unreachable!()
 }
 
-pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream) {
+pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream, game_servers: Arc<RwLock<HashMap<Uuid, Arc<GameServer>>>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
@@ -63,6 +67,14 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             }
         };
 
+        let game_server = Arc::new(GameServer {
+            players: HashMap::new()
+        });
+
+        if let Ok(mut servers) = game_servers.write() {
+            servers.insert(Uuid::new_v4(), game_server.clone());
+        };
+
         let remote_address = governor_address.0.to_string();
 
         thread::spawn(move || {
@@ -72,7 +84,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             let mut data_length_buffer = [0u8; 4];
 
             loop {
-                let packet = match packet::get_packet(&mut connection, &mut packet_id_buffer, &mut data_length_buffer) {
+                let proxy_packet = match packet::get_packet(&mut connection, &mut packet_id_buffer, &mut data_length_buffer) {
                     Ok(data) => data,
                     Err(err) => {
                         println!("[NODE] [GOVERNOR]-[CLIENT] Unknown packet received ({err})");
