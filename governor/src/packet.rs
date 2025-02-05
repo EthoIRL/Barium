@@ -17,6 +17,18 @@ pub fn send_packet(packet: impl Message, packet_id: u16, stream: &mut TcpStream)
     Ok(())
 }
 
+pub fn send_raw(packet: &[u8], packet_id: u16, stream: &mut TcpStream) -> Result<(), Error> {
+    let packet_id: [u8; 2] = u16::to_le_bytes(packet_id);
+    let data_length: [u8; 4] = u32::to_le_bytes(packet.len() as u32);
+
+    stream.write_all(&packet_id)?;
+    stream.write_all(&data_length)?;
+    stream.write_all(&packet)?;
+    stream.flush()?;
+
+    Ok(())
+}
+
 pub struct GenericPacket {
     pub id: u16,
     pub data: Vec<u8>

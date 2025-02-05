@@ -10,7 +10,7 @@ impl GenericHandler<Client, GenericPacket> for ClientProxy {
         let proxy_message = packet.decode::<ProxyMessage>()?;
 
         if let Some(node_stream) = client.node_stream.as_mut() {
-            packet::send_packet(proxy_message.message, 10, node_stream)?;
+            packet::send_raw(proxy_message.message_data.as_bytes(), proxy_message.message_id as u16, node_stream)?;
 
             return Ok(());
         }
