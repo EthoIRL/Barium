@@ -2,12 +2,15 @@ package tech.strateim.barium.Master.Packet;
 
 import com.google.protobuf.GeneratedMessageV3;
 import org.jetbrains.annotations.Nullable;
+import server.ProxyMessage;
+import tech.strateim.barium.Master.Enum.Status;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
@@ -28,7 +31,16 @@ public class PacketHandler {
         SendLock = new ReentrantLock();
     }
 
-    public void SendPacket(GeneratedMessageV3 packet, int id) throws Exception {
+    public void SendPacket(GeneratedMessageV3 packet, int id, Status state) throws Exception {
+        if (state == Status.Ready) {
+            String data = new String(packet.toByteArray(), StandardCharsets.UTF_8);
+            packet = ProxyMessage.newBuilder()
+                    .setMessageID(id)
+                    .setMessageData(data)
+                    .build();
+            id = 10;
+        }
+
         byte[] data = packet.toByteArray();
         byte[] packetId = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)id).array();
         byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
