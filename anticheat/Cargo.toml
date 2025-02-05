@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 prost = "0.13.4"
+uuid = { version = "1.11.0", features = ["v4"] }
 
 [build-dependencies]
 prost-build = "0.13.4"
