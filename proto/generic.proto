@@ -24,3 +24,9 @@ enum DisconnectReason {
   MismatchVersion = 2;
   Unknown = 3;
 }
+
+message ServerInfo {
+  int32 ServerVersion = 1;
+  Os Os = 2;
+  Protocol Protocol = 3;
+}

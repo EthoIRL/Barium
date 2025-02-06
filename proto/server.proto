@@ -9,9 +9,7 @@ import "generic.proto";
 message ServerRegistration {
   message Register {
     int32 PluginVersion = 1;
-    int32 ServerVersion = 2;
-    generic.Os Os = 3;
-    generic.Protocol Protocol = 4;
+    generic.ServerInfo ServerInfo = 2;
   }
 
   message Response {

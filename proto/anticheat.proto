@@ -29,4 +29,5 @@ message DisconnectNode {
 message NodeProxyNegotiation {
   uint32 Port = 1;
   string ClientKey = 2;
+  generic.ServerInfo ServerInfo = 3;
 }
