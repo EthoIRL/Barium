@@ -107,7 +107,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                 }
 
                 // TODO: Pick node based on resources & current clients connected
-                let node = match node_list.iter().find(|(uuid, node)| {
+                let node = match node_list.iter().find(|(_, node)| {
                     if let Ok(status) = node.status.read() {
                         if *status == NodeStatus::Ready {
                             return true;
