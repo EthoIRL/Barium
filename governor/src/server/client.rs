@@ -38,8 +38,7 @@ pub struct Client {
 pub enum ClientStatus {
     Initialization,
     Registered,
-    Ready,
-    Crash,
+    Ready
 }
 
 pub fn start_plugin_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<Arc<Mutex<Vec<JoinHandle<()>>>>, Error> {
