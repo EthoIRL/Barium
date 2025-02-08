@@ -68,6 +68,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
         };
 
         let game_server = Arc::new(GameServer {
+            info: negotiation.server_info.unwrap(),
             players: HashMap::new()
         });
 

@@ -200,10 +200,12 @@ pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Res
     };
 
     assert!(client.key.is_some(), "Client key is empty past registration phase.");
+    assert!(client.state.is_some(), "Client state is empty past registration phase.");
 
     let proxy_negotiation = NodeProxyNegotiation {
         port: stream_port,
         client_key: client.key.unwrap().to_string(),
+        server_info: client.state.unwrap().server_info,
     };
 
     if let Err(err) = packet::send_packet(proxy_negotiation, 3, &mut origin_stream) {
