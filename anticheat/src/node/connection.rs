@@ -72,14 +72,27 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             players: HashMap::new()
         });
 
-        if let Ok(mut servers) = game_servers.write() {
-            servers.insert(Uuid::new_v4(), game_server.clone());
-        };
-
+        let game_servers = game_servers.clone();
         let remote_address = governor_address.0.to_string();
 
         thread::spawn(move || {
-            let mut connection = TcpStream::connect((remote_address.as_str(), negotiation.port as u16)).unwrap();
+            let mut connection = match TcpStream::connect((remote_address.as_str(), negotiation.port as u16)) {
+                Ok(connection) => connection,
+                Err(err) => {
+                    println!("[NODE] [NODE]-[GOVERNOR] Couldn't connect to dynamic governor listener ({err})");
+                    return;
+                }
+            };
+
+            match game_servers.write() {
+                Ok(mut servers) => {
+                    servers.insert(Uuid::new_v4(), game_server.clone());
+                },
+                Err(err) => {
+                    println!("[NODE] Failed to write to in memory game server list. ({})", err);
+                    return;
+                }
+            }
 
             let mut packet_id_buffer = [0u8; 2];
             let mut data_length_buffer = [0u8; 4];
