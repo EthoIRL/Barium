@@ -16,12 +16,7 @@ pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     let mut data_length_buffer = [0u8; 4];
 
     loop {
-        let packet = match packet::get_packet(stream, &mut packet_id_buffer, &mut data_length_buffer) {
-            Ok(data) => data,
-            Err(err) => {
-                return Err(err);
-            }
-        };
+        let packet = packet::get_packet(stream, &mut packet_id_buffer, &mut data_length_buffer)?;
 
         assert_eq!(packet.id, 1, "Unknown packet received during registration response phase");
 
