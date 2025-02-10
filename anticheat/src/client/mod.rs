@@ -1,2 +1,3 @@
 pub mod game;
-mod player;
+pub mod player;
+mod packets;
