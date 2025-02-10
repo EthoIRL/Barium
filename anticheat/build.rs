@@ -1,20 +1,28 @@
 use std::io::Result;
+use std::path::PathBuf;
 
 const PROTO_DIR: &str = "../proto";
 
 fn main() -> Result<()> {
-    let proto_files = std::fs::read_dir(&PROTO_DIR)?
-        .filter_map(|entry| {
-            if let Ok(entry) = entry {
-                if entry.path().extension().is_some_and(|extension| extension == "proto") {
-                    return Some(entry.path())
-                }
-            }
-            None
-        })
-        .collect::<Vec<_>>();
+    let mut proto_files: Vec<PathBuf> = Vec::new();
+    traverse_proto_dir(PathBuf::from(&PROTO_DIR), &mut proto_files);
 
     prost_build::compile_protos(&proto_files, &[PROTO_DIR])?;
 
     Ok(())
+}
+
+fn traverse_proto_dir(directory: PathBuf, protos: &mut Vec<PathBuf>) {
+    std::fs::read_dir(&directory).unwrap()
+        .for_each(|entry| {
+            if let Ok(entry) = entry {
+                if entry.path().is_dir() {
+                    traverse_proto_dir(entry.path(), protos);
+                }
+
+                if entry.path().extension().is_some_and(|extension| extension == "proto") {
+                    protos.push(entry.path());
+                }
+            }
+        });
 }
