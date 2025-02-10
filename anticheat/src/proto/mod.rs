@@ -6,6 +6,6 @@ pub mod anticheat {
     include!(concat!(env!("OUT_DIR"), "/anticheat.rs"));
 }
 
-pub mod server {
-    include!(concat!(env!("OUT_DIR"), "/server.rs"));
+pub mod game {
+    include!(concat!(env!("OUT_DIR"), "/network.rs"));
 }
