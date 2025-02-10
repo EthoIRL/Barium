@@ -6,8 +6,10 @@ use std::thread;
 use prost::Message;
 use uuid::Uuid;
 use crate::client::game::GameServer;
+use crate::client::player::Player;
 
 use crate::packet;
+use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration::Response;
 use crate::proto::anticheat::NodeProxyNegotiation;
 
@@ -40,6 +42,11 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
+    let mut packet_handles: HashMap<u16, fn(&mut Arc<GameServer>, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
+    packet_handles.insert(Player::id(), Player::handle);
+
+    let arc_packet_handles = Arc::new(packet_handles);
+
     loop {
         let packet = match packet::get_packet(stream, &mut packet_id_buffer, &mut data_length_buffer) {
             Ok(data) => data,
@@ -62,13 +69,14 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             }
         };
 
-        let game_server = Arc::new(GameServer {
+        let mut game_server = Arc::new(GameServer {
             info: negotiation.server_info.unwrap(),
             players: HashMap::new()
         });
 
         let game_servers = game_servers.clone();
         let remote_address = governor_address.0.to_string();
+        let packets_handles = arc_packet_handles.clone();
 
         thread::spawn(move || {
             let mut connection = match TcpStream::connect((remote_address.as_str(), negotiation.port as u16)) {
@@ -102,6 +110,19 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
                 };
 
                 println!("[NODE] [GOVERNOR]-[CLIENT] Received from proxy connection (Id: {})", proxy_packet.id);
+
+                let packet_handle = match packets_handles.get(&proxy_packet.id) {
+                    Some(handler) => handler,
+                    None => {
+                        println!("[NODE] Unknown PacketID found from Client, ({})", proxy_packet.id);
+                        continue;
+                    }
+                };
+
+                if let Err(err) = packet_handle(&mut game_server, proxy_packet) {
+                    println!("[NODE] [CLIENT] An error occurred while handling a proxied game packet, ({})", err);
+                    continue;
+                };
             }
         });
     }
