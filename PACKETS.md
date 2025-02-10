@@ -46,3 +46,7 @@ Proto message within a message intended to be sent to the node corresponding cli
   - Id: 10
 
 # Game <-> Anticheat (Proxy)
+
+### PlayerJoin
+New player or already connected player needs to be registered anticheat side.
+- Id: 0
