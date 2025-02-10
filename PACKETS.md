@@ -46,6 +46,7 @@ Proto message within a message intended to be sent to the node corresponding cli
   - Id: 10
 
 # Game <-> Anticheat (Proxy)
+All packets within this hierarchy should be prefixed with ``Px_`` to denote proxied state skipping governor checks entirely.
 
 ### PlayerJoin
 New player or already connected player needs to be registered anticheat side.
