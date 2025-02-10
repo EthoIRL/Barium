@@ -44,3 +44,5 @@ Notifies the node that it should connect to a reverse proxy connection provided 
 ### **ProxyMessage**
 Proto message within a message intended to be sent to the node corresponding client.
   - Id: 10
+
+# Game <-> Anticheat (Proxy)
