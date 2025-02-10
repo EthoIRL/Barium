@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.manager.server.ServerManager;
 import generic.DisconnectReason;
 import generic.Os;
 import generic.Protocol;
+import generic.ServerInfo;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 import server.DisconnectServer;
@@ -118,11 +119,14 @@ public class Remote {
                 .setViaRewind(pluginManager.isPluginEnabled("ViaRewind"))
                 .setViaVersion(pluginManager.isPluginEnabled("ViaVersion"));
 
-        ServerRegistration.Register register = ServerRegistration.Register.newBuilder()
-                .setPluginVersion(0)
+        ServerInfo.Builder infoBuilder = ServerInfo.newBuilder()
                 .setServerVersion(serverManager.getVersion().getProtocolVersion())
                 .setOs(system)
-                .setProtocol(protocolBuilder)
+                .setProtocol(protocolBuilder);
+
+        ServerRegistration.Register register = ServerRegistration.Register.newBuilder()
+                .setPluginVersion(0)
+                .setServerInfo(infoBuilder)
                 .build();
 
         PacketHandler.SendPacketRetry(register, 0);
