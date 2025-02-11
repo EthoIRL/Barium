@@ -3,8 +3,12 @@ package tech.strateim.barium.Listeners;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
+import com.github.retrooper.packetevents.protocol.player.User;
+import network.Px_PlayerJoin;
+import network.Px_PlayerLeave;
 import tech.strateim.barium.Master.Remote;
 
+import java.util.UUID;
 
 public class PlayerListener implements PacketListener {
     private Remote Remote;
@@ -15,9 +19,34 @@ public class PlayerListener implements PacketListener {
 
     @Override
     public void onUserLogin(UserLoginEvent event) {
+        User user = event.getUser();
+        UUID userUuid = user.getUUID();
+
+        if (userUuid == null) {
+            return;
+        }
+
+        Px_PlayerJoin playerJoin = Px_PlayerJoin.newBuilder()
+                .setUuid(userUuid.toString())
+                .setName(user.getName())
+                .build();
+
+        Remote.GetPacketHandler().SendPacketRetry(playerJoin, 0, Remote.GetStateHandler().State);
     }
 
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
+        User user = event.getUser();
+        UUID userUuid = user.getUUID();
+
+        if (userUuid == null) {
+            return;
+        }
+
+        Px_PlayerLeave playerLeave = Px_PlayerLeave.newBuilder()
+                .setUuid(userUuid.toString())
+                .build();
+
+        Remote.GetPacketHandler().SendPacketRetry(playerLeave, 1, Remote.GetStateHandler().State);
     }
 }
