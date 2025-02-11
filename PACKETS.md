@@ -55,3 +55,7 @@ New player or already connected player needs to be registered anticheat side.
 ### PlayerLeave
 Player has disconnected and needs to be removed anticheat side.
 - Id: 1
+
+### **DisconnectServer**
+Notifies the remote node that a disconnection occurred on the governor side.
+- Id: 2
