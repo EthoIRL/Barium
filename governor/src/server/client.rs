@@ -253,7 +253,7 @@ pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: 
                     if err.kind() != ConnectionReset {
                         println!("[GOV] [NODE]-[CLIENT] Failed to get packet, ({:#?})", err);
                     }
-                    return;
+                    continue;
                 }
             };
 
@@ -267,7 +267,7 @@ pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: 
                     println!("[GOV] [NODE]-[CLIENT] Failed to send packet to the client, ({:#?})", err);
                 }
 
-                return;
+                continue;
             };
         }
     });
