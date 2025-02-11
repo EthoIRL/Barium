@@ -249,12 +249,7 @@ pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: 
 
             let packet = match packet::get_packet(&mut node_stream, &mut packet_id_buffer, &mut data_length_buffer) {
                 Ok(data) => data,
-                Err(err) => {
-                    if err.kind() != ConnectionReset {
-                        println!("[GOV] [NODE]-[CLIENT] Failed to get packet, ({:#?})", err);
-                    }
-                    continue;
-                }
+                Err(_) => continue
             };
 
             if packet.id != 10 {
@@ -276,6 +271,8 @@ pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: 
 pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
     println!("[GOV] [CLIENT] Client disconnected, Reason: ({:#?})", reason);
 
+    disconnect_from_relay(client);
+
     if let Ok(mut connection) = client.connected.write() {
         *connection = false;
     }
@@ -289,4 +286,17 @@ pub fn disconnect_client(client: &mut Client, reason: DisconnectReason) {
     };
 
     let _ = packet::send_packet(disconnect_packet, 2, &mut client.stream);
+}
+
+pub fn disconnect_from_relay(client: &mut Client) {
+    if client.status == ClientStatus::Ready {
+        let node_stream = client.node_stream.as_mut().unwrap();
+
+        let disconnect_packet = DisconnectServer {
+            uuid_key: None,
+            reason: i32::from(DisconnectReason::Shutdown)
+        };
+
+        let _ = packet::send_packet(disconnect_packet, 2, node_stream);
+    }
 }
