@@ -2,12 +2,14 @@ package tech.strateim.barium;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.github.retrooper.packetevents.util.TimeStampMode;
 import generic.DisconnectReason;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
+import tech.strateim.barium.Listeners.PlayerListener;
 import tech.strateim.barium.Master.Remote;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 
@@ -33,6 +35,8 @@ public final class Barium extends JavaPlugin {
 
         PeApi = PacketEvents.getAPI();
 
+        PeApi.getEventManager().registerListener(new PlayerListener(Remote), PacketListenerPriority.NORMAL);
+
         Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server, PeApi));
 
         PacketEventsSettings settings = PeApi.getSettings();
@@ -46,6 +50,8 @@ public final class Barium extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        PeApi.getEventManager().unregisterAllListeners();
+
         Remote.Disconnect(DisconnectReason.Shutdown);
         Remote.Shutdown();
 
