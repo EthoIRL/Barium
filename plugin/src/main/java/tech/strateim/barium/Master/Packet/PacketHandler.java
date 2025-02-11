@@ -48,7 +48,16 @@ public class PacketHandler {
         WritePacketBlocking(packetId, dataLength, data);
     }
 
-    public void SendPacketRetry(GeneratedMessageV3 packet, int id) {
+    public void SendPacketRetry(GeneratedMessageV3 packet, int id, Status state) {
+        if (state == Status.Ready) {
+            String data = new String(packet.toByteArray(), StandardCharsets.UTF_8);
+            packet = ProxyMessage.newBuilder()
+                    .setMessageID(id)
+                    .setMessageData(data)
+                    .build();
+            id = 10;
+        }
+
         byte[] data = packet.toByteArray();
         byte[] packetId = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)id).array();
         byte[] dataLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data.length).array();
