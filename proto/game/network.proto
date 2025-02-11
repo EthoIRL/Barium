@@ -8,3 +8,7 @@ message Px_PlayerJoin {
   string uuid = 1;
   string name = 2;
 }
+
+message Px_PlayerLeave {
+  string uuid = 1;
+}

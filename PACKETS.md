@@ -51,3 +51,7 @@ All packets within this hierarchy should be prefixed with ``Px_`` to denote prox
 ### PlayerJoin
 New player or already connected player needs to be registered anticheat side.
 - Id: 0
+
+### PlayerLeave
+Player has disconnected and needs to be removed anticheat side.
+- Id: 1
