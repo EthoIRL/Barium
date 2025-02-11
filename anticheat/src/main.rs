@@ -18,7 +18,10 @@ fn main() {
     println!("[NODE] Connecting to governor... {:?}", NODE_GOVERNOR);
     
     let mut stream = match TcpStream::connect(NODE_GOVERNOR) {
-        Ok(stream) => stream,
+        Ok(stream) => {
+            println!("[NODE] Successfully connected to remote governor");
+            stream
+        },
         Err(err) => {
             println!("[NODE] Failed to connect to governor server... ({})", err);
             return;
