@@ -69,7 +69,9 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             }
         };
 
+        let game_server_key = Uuid::new_v4();
         let mut game_server = Arc::new(GameServer {
+            key: game_server_key.clone(),
             info: negotiation.server_info.unwrap(),
             players: RwLock::new(HashMap::new())
         });
@@ -89,7 +91,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
 
             match game_servers.write() {
                 Ok(mut servers) => {
-                    servers.insert(Uuid::new_v4(), game_server.clone());
+                    servers.insert(game_server_key, game_server.clone());
                 },
                 Err(err) => {
                     println!("[NODE] Failed to write to in memory game server list. ({})", err);
