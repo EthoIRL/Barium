@@ -131,4 +131,12 @@ public class Remote {
 
         PacketHandler.SendPacketRetry(register, 0, null);
     }
+
+    public PacketHandler GetPacketHandler() {
+        return PacketHandler;
+    }
+
+    public StateHandler GetStateHandler() {
+        return StateHandler;
+    }
 }
