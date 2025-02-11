@@ -23,9 +23,8 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for Player {
 
         match game_server.players.write() {
             Ok(mut players) => {
-                players.insert(player_packet.uuid, player);
-
-                // println!("[NODE] [SERVER] New player has been registered to server ({}, {})")
+                players.insert(player_packet.uuid.clone(), player);
+                println!("[NODE] [SERVER] New player has been registered to server (Server: {}, Player: {})", game_server.key, player_packet.uuid);
             },
             Err(err) => {
                 return Err(err.to_string().into());
