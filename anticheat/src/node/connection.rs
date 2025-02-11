@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::net::TcpStream;
+use std::str::FromStr;
 use std::sync::{Arc, RwLock};
 use std::thread;
 use prost::Message;
@@ -69,7 +70,14 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             }
         };
 
-        let game_server_key = Uuid::new_v4();
+        let game_server_key = match Uuid::from_str(&negotiation.client_key) {
+            Ok(key) => key,
+            Err(err) => {
+                println!("[NODE] [GOVERNOR] Unable to decode uuid from key. ({err})");
+                continue;
+            }
+        };
+
         let mut game_server = Arc::new(GameServer {
             key: game_server_key.clone(),
             info: negotiation.server_info.unwrap(),
@@ -91,6 +99,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
 
             match game_servers.write() {
                 Ok(mut servers) => {
+                    println!("[NODE] Registered new game server ({})", game_server_key.to_string());
                     servers.insert(game_server_key, game_server.clone());
                 },
                 Err(err) => {
