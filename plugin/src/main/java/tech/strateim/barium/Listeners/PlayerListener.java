@@ -6,15 +6,18 @@ import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.player.User;
 import network.Px_PlayerJoin;
 import network.Px_PlayerLeave;
+import tech.strateim.barium.Game.ServerState;
 import tech.strateim.barium.Master.Remote;
 
 import java.util.UUID;
 
 public class PlayerListener implements PacketListener {
     private Remote Remote;
+    private ServerState ServerState;
 
-    public PlayerListener(Remote remote) {
+    public PlayerListener(Remote remote, ServerState serverState) {
         Remote = remote;
+        ServerState = serverState;
     }
 
     @Override
@@ -31,6 +34,8 @@ public class PlayerListener implements PacketListener {
                 .setName(user.getName())
                 .build();
 
+        ServerState.getUsers().put(userUuid, user);
+
         Remote.GetPacketHandler().SendPacketRetry(playerJoin, 0, Remote.GetStateHandler().State);
     }
 
@@ -46,6 +51,8 @@ public class PlayerListener implements PacketListener {
         Px_PlayerLeave playerLeave = Px_PlayerLeave.newBuilder()
                 .setUuid(userUuid.toString())
                 .build();
+
+        ServerState.getUsers().remove(userUuid);
 
         Remote.GetPacketHandler().SendPacketRetry(playerLeave, 1, Remote.GetStateHandler().State);
     }
