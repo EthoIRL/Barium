@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use crate::client::game::GameServer;
+use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
 

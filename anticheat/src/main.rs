@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::net::TcpStream;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
-use crate::client::game::GameServer;
+use crate::client::state::game::GameServer;
 use crate::node::{auth, connection};
 
 mod node;
