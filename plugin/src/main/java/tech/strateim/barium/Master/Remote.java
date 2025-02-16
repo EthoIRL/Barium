@@ -11,6 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import server.DisconnectServer;
 import server.ServerRegistration;
 import tech.strateim.barium.Barium;
+import tech.strateim.barium.Game.ServerState;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
 import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
@@ -41,12 +42,14 @@ public class Remote {
 
     private String _address;
     private int _port;
+    private ServerState _serverState;
     private PacketEventsAPI<?> _events;
 
-    public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer, PacketEventsAPI<?> packetEvents) {
+    public @Nullable PacketHandler Start(String governorAddress, int governorPort, Server localServer, ServerState serverState, PacketEventsAPI<?> packetEvents) {
         _address = governorAddress;
         _port = governorPort;
         _events = packetEvents;
+        _serverState = serverState;
 
         while (true) {
             try {
@@ -80,7 +83,7 @@ public class Remote {
         }
 
         PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
-        StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log, this);
+        StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log, this, serverState);
 
         ExecutorService.execute(StateHandler::StartReceiver);
         ExecutorService.execute(() -> InitRegistration(localServer, packetEvents));
@@ -94,7 +97,7 @@ public class Remote {
 
     public void Restart() {
         Log.log(Level.WARNING, "Attempting to reestablish connection to remote governor!");
-        ExecutorService.execute(() -> Barium.PacketHandler = Start(_address, _port, Barium.getServer(), _events));
+        ExecutorService.execute(() -> Barium.PacketHandler = Start(_address, _port, Barium.getServer(), _serverState, _events));
     }
 
     public void Disconnect(DisconnectReason reason) {

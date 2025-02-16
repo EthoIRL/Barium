@@ -9,6 +9,7 @@ import generic.DisconnectReason;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
+import tech.strateim.barium.Game.ServerState;
 import tech.strateim.barium.Listeners.PlayerListener;
 import tech.strateim.barium.Master.Remote;
 import tech.strateim.barium.Master.Packet.PacketHandler;
@@ -18,10 +19,10 @@ import java.util.logging.Logger;
 public final class Barium extends JavaPlugin {
     public Logger Log;
     public PacketEventsAPI<?> PeApi;
-
     public Server Server;
     public Remote Remote;
     public PacketHandler PacketHandler;
+    public ServerState ServerState;
 
     @Override
     public void onLoad() {
@@ -34,10 +35,11 @@ public final class Barium extends JavaPlugin {
         PacketEvents.getAPI().load();
 
         PeApi = PacketEvents.getAPI();
+        ServerState = new ServerState(Log);
 
-        PeApi.getEventManager().registerListener(new PlayerListener(Remote), PacketListenerPriority.NORMAL);
+        PeApi.getEventManager().registerListener(new PlayerListener(Remote, ServerState), PacketListenerPriority.NORMAL);
 
-        Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server, PeApi));
+        Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server, ServerState, PeApi));
 
         PacketEventsSettings settings = PeApi.getSettings();
         settings.checkForUpdates(false).debug(true).timeStampMode(TimeStampMode.NANO);
