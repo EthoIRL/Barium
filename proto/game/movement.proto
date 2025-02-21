@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package movement;
+
+option java_multiple_files = true;
+
+message Px_PlayerMovement {
+  string uuid = 1;
+  double x = 2;
+  double y = 3;
+  double z = 4;
+  double yaw = 5;
+  double pitch = 6;
+  // Not safe to rely on!
+  bool ground = 7;
+}

@@ -59,3 +59,7 @@ New player or already connected player needs to be registered anticheat side.
 ### PlayerLeave
 Player has disconnected and needs to be removed anticheat side.
 - Id: 2
+
+### PlayerMovement
+Player has moved position or performed client rotations.
+- Id: 3
