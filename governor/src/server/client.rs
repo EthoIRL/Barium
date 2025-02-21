@@ -137,6 +137,11 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                     if let Ok(node_list) = node_list.read() {
                         if !node_list.contains_key(&client.node_id.unwrap()) {
                             println!("[GOV] [CLIENT] Node no longer exists; disconnecting client");
+
+                            if let Ok(mut connection) = client.connected.write() {
+                                *connection = false;
+                            }
+
                             return;
                         }
                     }
