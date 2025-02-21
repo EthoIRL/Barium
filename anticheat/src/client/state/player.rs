@@ -37,7 +37,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerJoin {
     }
 
     fn id() -> u16 {
-        0
+        1
     }
 }
 
@@ -65,6 +65,6 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerLeave {
     }
 
     fn id() -> u16 {
-        1
+        2
     }
 }

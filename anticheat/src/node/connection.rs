@@ -124,7 +124,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
 
                 println!("[NODE] [GOVERNOR]-[CLIENT] Received from proxy connection (Id: {})", proxy_packet.id);
 
-                if proxy_packet.id == 2 {
+                if proxy_packet.id == 0 {
                     println!("[NODE] [GOVERNOR]-[CLIENT] Game server connection has been shutdown");
                     if let Ok(mut game_servers) = game_servers.write() {
                         game_servers.remove(&game_server_key);

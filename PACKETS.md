@@ -48,14 +48,14 @@ Proto message within a message intended to be sent to the node corresponding cli
 # Game <-> Anticheat (Proxy)
 All packets within this hierarchy should be prefixed with ``Px_`` to denote proxied state skipping governor checks entirely.
 
+### **DisconnectServer**
+Notifies the remote node that a disconnection occurred on the governor side.
+- Id: 0
+
 ### PlayerJoin
 New player or already connected player needs to be registered anticheat side.
-- Id: 0
+- Id: 1
 
 ### PlayerLeave
 Player has disconnected and needs to be removed anticheat side.
-- Id: 1
-
-### **DisconnectServer**
-Notifies the remote node that a disconnection occurred on the governor side.
 - Id: 2
