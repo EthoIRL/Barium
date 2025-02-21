@@ -41,7 +41,7 @@ public class ReadyHandler extends AbstractState {
                     .setName(user.getName())
                     .build();
 
-            packetHandler.SendPacketRetry(playerJoin, 0, stateHandler.State);
+            packetHandler.SendPacketRetry(playerJoin, 1, stateHandler.State);
         }
     }
 }

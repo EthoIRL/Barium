@@ -36,7 +36,7 @@ public class PlayerListener implements PacketListener {
 
         ServerState.getUsers().put(userUuid, user);
 
-        Remote.GetPacketHandler().SendPacketRetry(playerJoin, 0, Remote.GetStateHandler().State);
+        Remote.GetPacketHandler().SendPacketRetry(playerJoin, 1, Remote.GetStateHandler().State);
     }
 
     @Override
@@ -54,6 +54,6 @@ public class PlayerListener implements PacketListener {
 
         ServerState.getUsers().remove(userUuid);
 
-        Remote.GetPacketHandler().SendPacketRetry(playerLeave, 1, Remote.GetStateHandler().State);
+        Remote.GetPacketHandler().SendPacketRetry(playerLeave, 2, Remote.GetStateHandler().State);
     }
 }
