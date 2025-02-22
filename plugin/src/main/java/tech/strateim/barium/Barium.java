@@ -54,8 +54,6 @@ public final class Barium extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        PeApi.getEventManager().unregisterAllListeners();
-
         Remote.Disconnect(DisconnectReason.Shutdown);
         Remote.Shutdown();
 
