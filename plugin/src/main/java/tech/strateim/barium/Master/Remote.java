@@ -87,8 +87,6 @@ public class Remote {
         PacketHandler = new PacketHandler(Log, SocketOutput, SocketReceive);
         StateHandler = new StateHandler(PacketHandler, SocketOutput, SocketReceive, Log, this, serverState);
 
-        packetEvents.getEventManager().registerListener(new NetworkListener(this, Log), PacketListenerPriority.NORMAL);
-
         ExecutorService.execute(StateHandler::StartReceiver);
         ExecutorService.execute(() -> InitRegistration(localServer, packetEvents));
 

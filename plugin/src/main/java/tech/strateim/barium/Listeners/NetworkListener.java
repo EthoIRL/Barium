@@ -8,32 +8,28 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import tech.strateim.barium.Listeners.Handlers.GenericPacket;
 import tech.strateim.barium.Listeners.Handlers.MovementHandler;
 import tech.strateim.barium.Master.Enum.Status;
-import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.Remote;
-import tech.strateim.barium.Master.State.StateHandler;
 
 import javax.annotation.Nullable;
 import java.net.SocketException;
 import java.util.logging.Logger;
 
 public class NetworkListener implements PacketListener {
-
     private final Remote Remote;
     private final Logger Log;
-    private final StateHandler stateHandler;
-    private final PacketHandler packetHandler;
 
     public NetworkListener(Remote remote, Logger log) {
         Remote = remote;
         Log = log;
-
-        stateHandler = remote.GetStateHandler();
-        packetHandler = remote.GetPacketHandler();
     }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (stateHandler.State != Status.Ready || event.getConnectionState() != ConnectionState.PLAY) {
+        if (Remote.GetStateHandler() == null) {
+            return;
+        }
+
+        if (Remote.GetStateHandler().State != Status.Ready || event.getConnectionState() != ConnectionState.PLAY) {
             return;
         }
 
@@ -62,10 +58,10 @@ public class NetworkListener implements PacketListener {
         }
 
         try {
-            packetHandler.SendPacket(packet.getPacketData(), packet.getPacketId(), stateHandler.State);
+            Remote.GetPacketHandler().SendPacket(packet.getPacketData(), packet.getPacketId(), Remote.GetStateHandler().State);
         } catch (Exception ex){
             if (ex instanceof SocketException) {
-                stateHandler.State = Status.Crash;
+                Remote.GetStateHandler().State = Status.Crash;
                 Log.severe("Socket connection to governor lost!");
                 Remote.Restart();
             } else {
