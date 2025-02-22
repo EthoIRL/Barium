@@ -138,10 +138,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
                         if !node_list.contains_key(&client.node_id.unwrap()) {
                             println!("[GOV] [CLIENT] Node no longer exists; disconnecting client");
 
-                            if let Ok(mut connection) = client.connected.write() {
-                                *connection = false;
-                            }
-
+                            disconnect_client(&mut client, DisconnectReason::Unknown);
                             return;
                         }
                     }
@@ -176,7 +173,10 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
             }
         };
 
-        packet_handle(&mut client, packet).unwrap();
+        if let Err(err) = packet_handle(&mut client, packet) {
+            disconnect_client(&mut client, DisconnectReason::Unknown);
+            return;
+        }
     }
 
     unreachable!()
