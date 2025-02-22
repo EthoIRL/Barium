@@ -1,5 +1,6 @@
 package tech.strateim.barium.Master.State.Disconnection;
 
+import generic.DisconnectReason;
 import server.DisconnectServer;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
@@ -41,6 +42,11 @@ public class DisconnectionHandler extends AbstractState {
 
         log.info("Remote shutdown initiated (Reason: " + response.getReason() + ")");
 
-        remote.Shutdown();
+        if (response.getReason() == DisconnectReason.Shutdown) {
+            remote.Shutdown();
+            return;
+        }
+
+        remote.Restart();
     }
 }
