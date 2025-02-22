@@ -33,7 +33,7 @@ public class Remote {
     private Socket Socket;
     private OutputStream SocketOutput;
     private InputStream SocketReceive;
-    public final ExecutorService ExecutorService = Executors.newFixedThreadPool(8);
+    public ExecutorService ExecutorService = Executors.newFixedThreadPool(8);
     private PacketHandler PacketHandler;
     private StateHandler StateHandler;
 
@@ -100,8 +100,13 @@ public class Remote {
     }
 
     public void Restart() {
-        Log.log(Level.WARNING, "Attempting to reestablish connection to remote governor!");
-        ExecutorService.execute(() -> Barium.PacketHandler = Start(_address, _port, Barium.getServer(), _serverState, _events));
+        if (!ExecutorService.isShutdown()) {
+            Log.log(Level.WARNING, "Attempting to reestablish connection to remote governor!");
+
+            ExecutorService.shutdownNow();
+            ExecutorService = Executors.newFixedThreadPool(8);
+            ExecutorService.execute(() -> Barium.PacketHandler = Start(_address, _port, Barium.getServer(), _serverState, _events));
+        }
     }
 
     public void Disconnect(DisconnectReason reason) {
