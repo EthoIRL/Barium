@@ -28,3 +28,16 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerRotation {
         4
     }
 }
+
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerGround {
+    fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
+        let player_movement = packet.decode::<PxPlayerGround>()?;
+        println!("Ground: [{:#?}]", player_movement.ground);
+
+        Ok(())
+    }
+
+    fn id() -> u16 {
+        5
+    }
+}
