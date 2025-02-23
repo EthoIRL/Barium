@@ -7,7 +7,8 @@ use std::thread;
 use prost::Message;
 use uuid::Uuid;
 use crate::client::state::game::GameServer;
-use crate::client::state::player::{PlayerJoin, PlayerLeave, PlayerMovement};
+use crate::client::state::handlers::movement::{PlayerMovement, PlayerRotation};
+use crate::client::state::player::{PlayerJoin, PlayerLeave};
 
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::game::{PxPlayerJoin, PxPlayerLeave, PxPlayerMovement};
+use crate::proto::game::{PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
 
 pub struct Player {
     uuid: String,
@@ -66,20 +66,5 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerLeave {
 
     fn id() -> u16 {
         2
-    }
-}
-
-pub struct PlayerMovement {}
-
-impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerMovement {
-    fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
-        let player_movement = packet.decode::<PxPlayerMovement>()?;
-        println!("[{:#?} {:#?} {:#?}] [{:#?}]", player_movement.x, player_movement.y, player_movement.z, player_movement.ground);
-
-        Ok(())
-    }
-
-    fn id() -> u16 {
-        3
     }
 }
