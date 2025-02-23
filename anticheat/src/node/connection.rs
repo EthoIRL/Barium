@@ -7,7 +7,7 @@ use std::thread;
 use prost::Message;
 use uuid::Uuid;
 use crate::client::state::game::GameServer;
-use crate::client::state::player::{PlayerJoin, PlayerLeave};
+use crate::client::state::player::{PlayerJoin, PlayerLeave, PlayerMovement};
 
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
@@ -46,6 +46,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     let mut packet_handles: HashMap<u16, fn(&mut Arc<GameServer>, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
     packet_handles.insert(PlayerJoin::id(), PlayerJoin::handle);
     packet_handles.insert(PlayerLeave::id(), PlayerLeave::handle);
+    packet_handles.insert(PlayerMovement::id(), PlayerMovement::handle);
 
     let arc_packet_handles = Arc::new(packet_handles);
 
