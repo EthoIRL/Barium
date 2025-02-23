@@ -61,5 +61,9 @@ Player has disconnected and needs to be removed anticheat side.
 - Id: 2
 
 ### PlayerMovement
-Player has moved position or performed client rotations.
+Player has moved position.
 - Id: 3
+
+### PlayerRotation
+Player performed rotations.
+- Id: 4
