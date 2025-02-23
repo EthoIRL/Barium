@@ -48,6 +48,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     packet_handles.insert(PlayerJoin::id(), PlayerJoin::handle);
     packet_handles.insert(PlayerLeave::id(), PlayerLeave::handle);
     packet_handles.insert(PlayerMovement::id(), PlayerMovement::handle);
+    packet_handles.insert(PlayerRotation::id(), PlayerRotation::handle);
 
     let arc_packet_handles = Arc::new(packet_handles);
 

@@ -46,6 +46,10 @@ public class NetworkListener implements PacketListener {
         if (MovementHandler.IsPosition(id, clientVersion)) {
             MovementHandler.HandlePosition(userUuid, event, this);
         }
+
+        if (MovementHandler.IsRotation(id, clientVersion)) {
+            MovementHandler.HandleRotation(userUuid, event, this);
+        }
     }
 
     public void HandlePacket(Message packet, int packetId) {

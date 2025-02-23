@@ -18,3 +18,17 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerMovement {
     }
 }
 
+pub struct PlayerRotation {}
+
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerRotation {
+    fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
+        let player_movement = packet.decode::<PxPlayerRotation>()?;
+        println!("[{:#?} {:#?}]", player_movement.yaw, player_movement.pitch);
+
+        Ok(())
+    }
+
+    fn id() -> u16 {
+        4
+    }
+}
