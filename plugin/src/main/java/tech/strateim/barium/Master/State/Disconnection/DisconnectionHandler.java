@@ -47,6 +47,7 @@ public class DisconnectionHandler extends AbstractState {
             return;
         }
 
+        stateHandler.State = Status.Crash;
         remote.Restart();
     }
 }
