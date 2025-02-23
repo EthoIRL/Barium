@@ -5,12 +5,11 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import tech.strateim.barium.Listeners.Handlers.GenericPacket;
+import com.google.protobuf.Message;
 import tech.strateim.barium.Listeners.Handlers.MovementHandler;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Remote;
 
-import javax.annotation.Nullable;
 import java.net.SocketException;
 import java.util.logging.Logger;
 
@@ -38,27 +37,24 @@ public class NetworkListener implements PacketListener {
         ClientVersion clientVersion = user.getClientVersion();
         int id = event.getPacketId();
 
-        HandlePacket(InvokePacketMatch(user, clientVersion, id, event));
+        InvokePacketMatch(user, clientVersion, id, event);
     }
 
-    @Nullable
-    public GenericPacket InvokePacketMatch(User user, ClientVersion clientVersion, int id, PacketReceiveEvent event) {
+    public void InvokePacketMatch(User user, ClientVersion clientVersion, int id, PacketReceiveEvent event) {
         String userUuid = user.getUUID().toString();
 
         if (MovementHandler.IsPosition(id, clientVersion)) {
-            return MovementHandler.HandlePosition(userUuid, event);
+            MovementHandler.HandlePosition(userUuid, event, this);
         }
-
-        return null;
     }
 
-    public void HandlePacket(@Nullable GenericPacket packet) {
+    public void HandlePacket(Message packet, int packetId) {
         if (packet == null) {
             return;
         }
 
         try {
-            Remote.GetPacketHandler().SendPacket(packet.getPacketData(), packet.getPacketId(), Remote.GetStateHandler().State);
+            Remote.GetPacketHandler().SendPacket(packet, packetId, Remote.GetStateHandler().State);
         } catch (Exception ex){
             if (ex instanceof SocketException) {
                 Remote.GetStateHandler().State = Status.Crash;

@@ -5,20 +5,18 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import movement.Px_PlayerMovement;
-
-import javax.annotation.Nullable;
+import movement.Px_PlayerRotation;
+import tech.strateim.barium.Listeners.NetworkListener;
 
 import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Client.*;
 
 public class MovementHandler {
 
-    @Nullable
-    public static GenericPacket HandlePosition(String userUuid, PacketReceiveEvent event) {
+    public static void HandlePosition(String userUuid, PacketReceiveEvent event, NetworkListener networkListener) {
         WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
+        Location location = flying.getLocation();
 
-        if (flying.hasPositionChanged() || flying.hasRotationChanged()) {
-            Location location = flying.getLocation();
-
+        if (flying.hasPositionChanged()) {
             Px_PlayerMovement playerMovement = Px_PlayerMovement.newBuilder()
                     .setUuid(userUuid)
                     .setX(location.getX())
@@ -27,10 +25,9 @@ public class MovementHandler {
                     .setGround(flying.isOnGround())
                     .build();
 
-            return new GenericPacket(playerMovement, 3);
+            networkListener.HandlePacket(playerMovement, 3);
         }
 
-        return null;
     }
 
     public static boolean IsPosition(int id, ClientVersion clientVersion) {
