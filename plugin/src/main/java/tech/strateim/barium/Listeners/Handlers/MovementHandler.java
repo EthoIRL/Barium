@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import movement.Px_PlayerGround;
 import movement.Px_PlayerMovement;
 import movement.Px_PlayerRotation;
 import tech.strateim.barium.Listeners.NetworkListener;
@@ -16,13 +17,19 @@ public class MovementHandler {
         WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
         Location location = flying.getLocation();
 
+        Px_PlayerGround playerGround = Px_PlayerGround.newBuilder()
+                .setUuid(userUuid)
+                .setGround(flying.isOnGround())
+                .build();
+
+        networkListener.HandlePacket(playerGround, 5);
+
         if (flying.hasPositionChanged()) {
             Px_PlayerMovement playerMovement = Px_PlayerMovement.newBuilder()
                     .setUuid(userUuid)
                     .setX(location.getX())
                     .setY(location.getY())
                     .setZ(location.getZ())
-                    .setGround(flying.isOnGround())
                     .build();
 
             networkListener.HandlePacket(playerMovement, 3);
