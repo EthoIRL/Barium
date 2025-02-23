@@ -33,7 +33,7 @@ public class PacketHandler {
 
     public void SendPacket(Message packet, int id, Status state) throws Exception {
         if (state == Status.Ready) {
-            String data = new String(packet.toByteArray(), StandardCharsets.UTF_8);
+            String data = new String(packet.toByteArray(), StandardCharsets.ISO_8859_1);
             packet = ProxyMessage.newBuilder()
                     .setMessageID(id)
                     .setMessageData(data)
