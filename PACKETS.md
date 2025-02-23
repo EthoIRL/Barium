@@ -67,3 +67,7 @@ Player has moved position.
 ### PlayerRotation
 Player performed rotations.
 - Id: 4
+
+### PlayerGround
+Player's ground status has changed.
+- Id: 5

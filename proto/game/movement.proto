@@ -9,12 +9,16 @@ message Px_PlayerMovement {
   double x = 2;
   double y = 3;
   double z = 4;
-  // Not safe to rely on!
-  bool ground = 7;
 }
 
 message Px_PlayerRotation {
   string uuid = 1;
   float yaw = 2;
   float pitch = 3;
+}
+
+// Not safe to rely on!
+message Px_PlayerGround {
+  string uuid = 1;
+  bool ground = 2;
 }
