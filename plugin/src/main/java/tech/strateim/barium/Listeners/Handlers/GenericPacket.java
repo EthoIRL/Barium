@@ -1,15 +1,15 @@
 package tech.strateim.barium.Listeners.Handlers;
 
-import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.Message;
 
 import javax.annotation.Nullable;
 
 @Nullable
 public class GenericPacket {
     private final int packetId;
-    private final GeneratedMessageV3 packetData;
+    private final Message packetData;
 
-    public GenericPacket(GeneratedMessageV3 PacketData, int PacketId) {
+    public GenericPacket(Message PacketData, int PacketId) {
         packetData = PacketData;
         packetId = PacketId;
     }
@@ -18,7 +18,7 @@ public class GenericPacket {
         return packetId;
     }
 
-    public GeneratedMessageV3 getPacketData() {
+    public Message getPacketData() {
         return packetData;
     }
 }

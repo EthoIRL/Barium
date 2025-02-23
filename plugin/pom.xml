@@ -44,22 +44,27 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.github.retrooper</pattern>
-                                    <shadedPattern>com.github.retrooper.barium
+                                    <shadedPattern>tech.strateim.barium.com.github.retrooper
                                     </shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>io.github.retrooper</pattern>
-                                    <shadedPattern>io.github.retrooper.barium
+                                    <shadedPattern>tech.strateim.barium.io.github.retrooper
                                     </shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>net.kyori</pattern>
-                                    <shadedPattern>com.github.retrooper.barium.packetevents.libs.net.kyori
+                                    <shadedPattern>tech.strateim.barium.net.kyori
                                     </shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
-                                    <shadedPattern>com.github.retrooper.barium.packetevents.libs.com.google.gson
+                                    <shadedPattern>tech.strateim.barium.com.google.gson
+                                    </shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.protobuf</pattern>
+                                    <shadedPattern>tech.strateim.barium.com.google.protobuf
                                     </shadedPattern>
                                 </relocation>
                             </relocations>
@@ -146,7 +151,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.25.3</version>
+            <version>4.29.3</version>
         </dependency>
 
         <dependency>

@@ -1,6 +1,6 @@
 package tech.strateim.barium.Master.Packet;
 
-import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.Message;
 import org.jetbrains.annotations.Nullable;
 import server.ProxyMessage;
 import tech.strateim.barium.Master.Enum.Status;
@@ -31,7 +31,7 @@ public class PacketHandler {
         SendLock = new ReentrantLock();
     }
 
-    public void SendPacket(GeneratedMessageV3 packet, int id, Status state) throws Exception {
+    public void SendPacket(Message packet, int id, Status state) throws Exception {
         if (state == Status.Ready) {
             String data = new String(packet.toByteArray(), StandardCharsets.UTF_8);
             packet = ProxyMessage.newBuilder()
@@ -48,7 +48,7 @@ public class PacketHandler {
         WritePacketBlocking(packetId, dataLength, data);
     }
 
-    public void SendPacketRetry(GeneratedMessageV3 packet, int id, Status state) {
+    public void SendPacketRetry(Message packet, int id, Status state) {
         if (state == Status.Ready) {
             String data = new String(packet.toByteArray(), StandardCharsets.UTF_8);
             packet = ProxyMessage.newBuilder()
@@ -134,7 +134,7 @@ public class PacketHandler {
         return null;
     }
 
-    public <T extends GeneratedMessageV3> @Nullable GeneratedMessageV3 SerializePacket(T packetType, Packet packet) throws Exception {
+    public <T extends Message> @Nullable Message SerializePacket(T packetType, Packet packet) throws Exception {
         return packetType.getParserForType().parseFrom(packet.data());
     }
 }
