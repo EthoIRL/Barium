@@ -1,16 +1,14 @@
 use std::sync::Arc;
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::game::{PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
+use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
 
 pub struct Player {
     uuid: String,
     name: String
 }
 
-pub struct PlayerJoin {}
-
-impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerJoin {
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
     fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         let join_packet = packet.decode::<PxPlayerJoin>()?;
 
@@ -41,9 +39,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerJoin {
     }
 }
 
-pub struct PlayerLeave {}
-
-impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerLeave {
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerLeave {
     fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         let leave_packet = packet.decode::<PxPlayerLeave>()?;
 

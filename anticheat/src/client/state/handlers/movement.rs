@@ -1,14 +1,12 @@
 use std::sync::Arc;
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::game::{PxPlayerMovement, PxPlayerRotation};
+use crate::proto::game::{PxPlayerGround, PxPlayerMovement, PxPlayerRotation};
 
-pub struct PlayerMovement {}
-
-impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerMovement {
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerMovement {
     fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         let player_movement = packet.decode::<PxPlayerMovement>()?;
-        println!("[{:#?} {:#?} {:#?}] [{:#?}]", player_movement.x, player_movement.y, player_movement.z, player_movement.ground);
+        println!("[{:#?} {:#?} {:#?}]", player_movement.x, player_movement.y, player_movement.z);
 
         Ok(())
     }
@@ -18,9 +16,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerMovement {
     }
 }
 
-pub struct PlayerRotation {}
-
-impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerRotation {
+impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerRotation {
     fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         let player_movement = packet.decode::<PxPlayerRotation>()?;
         println!("[{:#?} {:#?}]", player_movement.yaw, player_movement.pitch);

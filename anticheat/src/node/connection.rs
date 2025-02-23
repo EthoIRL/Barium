@@ -7,13 +7,12 @@ use std::thread;
 use prost::Message;
 use uuid::Uuid;
 use crate::client::state::game::GameServer;
-use crate::client::state::handlers::movement::{PlayerMovement, PlayerRotation};
-use crate::client::state::player::{PlayerJoin, PlayerLeave};
 
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration::Response;
 use crate::proto::anticheat::NodeProxyNegotiation;
+use crate::proto::game::{PxPlayerGround, PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
 
 pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     let mut packet_id_buffer = [0u8; 2];
@@ -45,10 +44,10 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     let mut data_length_buffer = [0u8; 4];
 
     let mut packet_handles: HashMap<u16, fn(&mut Arc<GameServer>, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
-    packet_handles.insert(PlayerJoin::id(), PlayerJoin::handle);
-    packet_handles.insert(PlayerLeave::id(), PlayerLeave::handle);
-    packet_handles.insert(PlayerMovement::id(), PlayerMovement::handle);
-    packet_handles.insert(PlayerRotation::id(), PlayerRotation::handle);
+    packet_handles.insert(PxPlayerJoin::id(), PxPlayerJoin::handle);
+    packet_handles.insert(PxPlayerLeave::id(), PxPlayerLeave::handle);
+    packet_handles.insert(PxPlayerMovement::id(), PxPlayerMovement::handle);
+    packet_handles.insert(PxPlayerRotation::id(), PxPlayerRotation::handle);
 
     let arc_packet_handles = Arc::new(packet_handles);
 
