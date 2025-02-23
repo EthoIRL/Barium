@@ -26,7 +26,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerJoin {
         match game_server.players.write() {
             Ok(mut players) => {
                 players.insert(join_packet.uuid.clone(), player);
-                println!("[NODE] [SERVER] New player has been registered to server (Server: {}, Player: {})", game_server.key, join_packet.uuid);
+                println!("[NODE] [SERVER] Player has been registered to server (Server: {}, Player: {})", game_server.key, join_packet.uuid);
             },
             Err(err) => {
                 return Err(err.to_string().into());
@@ -54,7 +54,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PlayerLeave {
         match game_server.players.write() {
             Ok(mut players) => {
                 players.remove(&leave_packet.uuid);
-                println!("[NODE] [SERVER] New player has been removed from the server (Server: {}, Player: {})", game_server.key, leave_packet.uuid);
+                println!("[NODE] [SERVER] Player has been removed from server (Server: {}, Player: {})", game_server.key, leave_packet.uuid);
             },
             Err(err) => {
                 return Err(err.to_string().into());
