@@ -9,8 +9,6 @@ message Px_PlayerMovement {
   double x = 2;
   double y = 3;
   double z = 4;
-  double yaw = 5;
-  double pitch = 6;
   // Not safe to rely on!
   bool ground = 7;
 }

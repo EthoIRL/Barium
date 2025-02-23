@@ -19,16 +19,15 @@ public class MovementHandler {
         if (flying.hasPositionChanged() || flying.hasRotationChanged()) {
             Location location = flying.getLocation();
 
-            Px_PlayerMovement.Builder playerMovement = Px_PlayerMovement.newBuilder();
-            playerMovement.setUuid(userUuid);
-            playerMovement.setX(location.getX());
-            playerMovement.setY(location.getY());
-            playerMovement.setZ(location.getZ());
-            playerMovement.setYaw(location.getYaw());
-            playerMovement.setPitch(location.getPitch());
-            playerMovement.setGround(flying.isOnGround());
+            Px_PlayerMovement playerMovement = Px_PlayerMovement.newBuilder()
+                    .setUuid(userUuid)
+                    .setX(location.getX())
+                    .setY(location.getY())
+                    .setZ(location.getZ())
+                    .setGround(flying.isOnGround())
+                    .build();
 
-            return new GenericPacket(playerMovement.build(), 3);
+            return new GenericPacket(playerMovement, 3);
         }
 
         return null;
