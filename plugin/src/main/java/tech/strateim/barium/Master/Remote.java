@@ -1,7 +1,6 @@
 package tech.strateim.barium.Master;
 
 import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.manager.server.ServerManager;
 import generic.DisconnectReason;
 import generic.Os;
@@ -13,7 +12,7 @@ import server.DisconnectServer;
 import server.ServerRegistration;
 import tech.strateim.barium.Barium;
 import tech.strateim.barium.Game.ServerState;
-import tech.strateim.barium.Listeners.NetworkListener;
+import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.StateHandler;
 import tech.strateim.barium.Master.Utilities.PacketEventsConversion;
@@ -98,6 +97,12 @@ public class Remote {
     }
 
     public void Restart() {
+        if (StateHandler.State != Status.Crash) {
+            return;
+        }
+
+        StateHandler.State = Status.Initialization;
+
         if (!ExecutorService.isShutdown()) {
             Log.log(Level.WARNING, "Attempting to reestablish connection to remote governor!");
 
