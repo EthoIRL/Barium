@@ -174,6 +174,7 @@ pub fn handle_client(mut client: Client, node_list: Arc<RwLock<HashMap<Uuid, Arc
         };
 
         if let Err(err) = packet_handle(&mut client, packet) {
+            println!("{:#?}", err);
             disconnect_client(&mut client, DisconnectReason::Unknown);
             return;
         }
@@ -302,6 +303,6 @@ pub fn disconnect_from_relay(client: &mut Client) {
             reason: i32::from(DisconnectReason::Shutdown)
         };
 
-        let _ = packet::send_packet(disconnect_packet, 2, node_stream);
+        let _ = packet::send_packet(disconnect_packet, 0, node_stream);
     }
 }
