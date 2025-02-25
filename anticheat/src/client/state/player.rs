@@ -1,11 +1,34 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
 
 pub struct Player {
-    uuid: String,
-    name: String
+    pub uuid: String,
+    pub name: String,
+    pub position: RwLock<Position>
+}
+
+pub struct Position {
+    pub x: Option<f64>,
+    pub y: Option<f64>,
+    pub z: Option<f64>,
+    pub yaw: Option<f32>,
+    pub pitch: Option<f32>,
+    pub ground: Option<bool>
+}
+
+impl Default for Position {
+    fn default() -> Self {
+        Position {
+            x: None,
+            y: None,
+            z: None,
+            yaw: None,
+            pitch: None,
+            ground: None
+        }
+    }
 }
 
 impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
@@ -18,7 +41,8 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
 
         let player = Player {
             uuid: join_packet.uuid.clone(),
-            name: join_packet.name
+            name: join_packet.name,
+            position: RwLock::new(Position::default())
         };
 
         match game_server.players.write() {
