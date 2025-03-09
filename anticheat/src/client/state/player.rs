@@ -6,28 +6,19 @@ use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
 pub struct Player {
     pub uuid: String,
     pub name: String,
-    pub position: RwLock<Position>
 }
 
-pub struct Position {
-    pub x: Option<f64>,
-    pub y: Option<f64>,
-    pub z: Option<f64>,
-    pub yaw: Option<f32>,
-    pub pitch: Option<f32>,
-    pub ground: Option<bool>
+pub struct LocationPosition {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub ground: bool
 }
 
-impl Default for Position {
-    fn default() -> Self {
-        Position {
-            x: None,
-            y: None,
-            z: None,
-            yaw: None,
-            pitch: None,
-            ground: None
-        }
+pub struct RotationPosition {
+    pub yaw: f32,
+    pub pitch: f32,
+}
     }
 }
 
@@ -42,7 +33,6 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
         let player = Player {
             uuid: join_packet.uuid.clone(),
             name: join_packet.name,
-            position: RwLock::new(Position::default())
         };
 
         match game_server.players.write() {
