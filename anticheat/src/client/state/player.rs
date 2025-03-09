@@ -1,4 +1,5 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use circular_buffer::CircularBuffer;
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
@@ -6,6 +7,8 @@ use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
 pub struct Player {
     pub uuid: String,
     pub name: String,
+    pub locational_position: CircularBuffer<20, LocationPosition>,
+    pub rotational_position: CircularBuffer<20, RotationPosition>
 }
 
 pub struct LocationPosition {
@@ -33,6 +36,8 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
         let player = Player {
             uuid: join_packet.uuid.clone(),
             name: join_packet.name,
+            locational_position: CircularBuffer::new(),
+            rotational_position: CircularBuffer::new()
         };
 
         match game_server.players.write() {
