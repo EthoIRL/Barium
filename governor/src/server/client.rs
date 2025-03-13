@@ -263,7 +263,7 @@ pub fn node_client_relay(client_connection: Arc<RwLock<bool>>, mut node_stream: 
                 continue;
             }
 
-            if let Err(err) = packet::send_packet(packet.data, 10, &mut client_stream) {
+            if let Err(err) = packet::send_raw(&*packet.data, 10, &mut client_stream) {
                 if err.kind() != ConnectionReset {
                     println!("[GOV] [NODE]-[CLIENT] Failed to send packet to the client, ({:#?})", err);
                 }
