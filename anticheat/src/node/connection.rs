@@ -81,13 +81,6 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
             }
         };
 
-        let mut game_server = Arc::new(GameServer {
-            key: game_server_key.clone(),
-            info: negotiation.server_info.unwrap(),
-            players: RwLock::new(HashMap::new()),
-            ..GameServer::default()
-        });
-
         let game_servers = game_servers.clone();
         let remote_address = governor_address.0.to_string();
         let packets_handles = arc_packet_handles.clone();
@@ -100,6 +93,13 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
                     return;
                 }
             };
+
+            let mut game_server = Arc::new(GameServer {
+                relay: connection.try_clone().unwrap(),
+                key: game_server_key.clone(),
+                info: negotiation.server_info.unwrap(),
+                players: RwLock::new(HashMap::new())
+            });
 
             match game_servers.write() {
                 Ok(mut servers) => {
