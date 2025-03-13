@@ -6,6 +6,8 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use prost::Message;
 use uuid::Uuid;
+use crate::client::checks::check::GenericCheck;
+use crate::client::checks::movement::fly::y_prediction::YPrediction;
 use crate::client::state::game::GameServer;
 
 use crate::packet;
@@ -146,6 +148,12 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
                     println!("[NODE] [CLIENT] An error occurred while handling a proxied game packet, ({})", err);
                     continue;
                 };
+
+                if let Ok(player_list) = game_server.players.read() {
+                    for (_, player) in player_list.iter() {
+                        YPrediction::handle(player, &game_server);
+                    }
+                }
             }
         });
     }
