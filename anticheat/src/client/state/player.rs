@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use circular_buffer::CircularBuffer;
+use crate::client::checks::check::CheckInfo;
 use crate::client::state::game::GameServer;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
@@ -22,6 +23,13 @@ pub struct RotationPosition {
     pub yaw: f32,
     pub pitch: f32,
 }
+
+impl Player {
+    pub fn warn(&self, server: &Arc<GameServer>, check_info: CheckInfo) {
+    }
+
+    pub fn lag_back(&self, location_position: LocationPosition, rotation_position: RotationPosition) {
+        todo!()
     }
 }
 
