@@ -2,8 +2,9 @@ use std::sync::Arc;
 use circular_buffer::CircularBuffer;
 use crate::client::checks::check::CheckInfo;
 use crate::client::state::game::GameServer;
+use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::game::{PxPlayerJoin, PxPlayerLeave};
+use crate::proto::game::{PxPlayerJoin, PxPlayerLeave, PxPlayerWarn};
 
 pub struct Player {
     pub uuid: String,
@@ -26,6 +27,13 @@ pub struct RotationPosition {
 
 impl Player {
     pub fn warn(&self, server: &Arc<GameServer>, check_info: CheckInfo) {
+        packet::send_proxied_packet(PxPlayerWarn {
+            uuid: self.uuid.clone(),
+            check_type: check_info.r#type.to_string(),
+            check_name: check_info.name,
+            check_weight: check_info.weight as i32,
+            check_experimental: check_info.experimental
+        }, 0, &mut server.relay.try_clone().unwrap()).unwrap();
     }
 
     pub fn lag_back(&self, location_position: LocationPosition, rotation_position: RotationPosition) {
