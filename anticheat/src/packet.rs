@@ -2,6 +2,7 @@ use std::io::{Error, Read, Write};
 use std::net::TcpStream;
 use std::u16;
 use prost::Message;
+use crate::proto::generic::ProxyMessage;
 
 pub fn send_packet(packet: impl Message, packet_id: u16, stream: &mut TcpStream) -> Result<(), Error> {
     let data_buffer: Vec<u8> = packet.encode_to_vec();
@@ -16,6 +17,28 @@ pub fn send_packet(packet: impl Message, packet_id: u16, stream: &mut TcpStream)
 
     Ok(())
 }
+
+pub fn send_proxied_packet(packet: impl Message, packet_id: u16, stream: &mut TcpStream) -> Result<(), Error> {
+    let original_data_buffer: Vec<u8> = packet.encode_to_vec();
+
+    let proxied_message = ProxyMessage {
+        message_id: packet_id as u32,
+        message_data: encoding_rs::mem::decode_latin1(&*original_data_buffer).to_string()
+    };
+
+    let data_buffer: Vec<u8> = proxied_message.encode_to_vec();
+
+    let packet_id: [u8; 2] = u16::to_le_bytes(10);
+    let data_length: [u8; 4] = u32::to_le_bytes(data_buffer.len() as u32);
+
+    stream.write_all(&packet_id)?;
+    stream.write_all(&data_length)?;
+    stream.write_all(&data_buffer)?;
+    stream.flush()?;
+
+    Ok(())
+}
+
 
 pub struct GenericPacket {
     pub id: u16,
