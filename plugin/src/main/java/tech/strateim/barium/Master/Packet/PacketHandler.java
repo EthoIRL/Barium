@@ -1,8 +1,8 @@
 package tech.strateim.barium.Master.Packet;
 
 import com.google.protobuf.Message;
+import generic.ProxyMessage;
 import org.jetbrains.annotations.Nullable;
-import server.ProxyMessage;
 import tech.strateim.barium.Master.Enum.Status;
 
 import java.io.IOException;

@@ -24,9 +24,3 @@ message DisconnectServer {
 }
 
 message Ready {}
-
-message ProxyMessage {
-  uint32 MessageID = 1;
-  // Message data is encoding with utf-8
-  string MessageData = 2;
-}

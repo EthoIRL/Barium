@@ -1,6 +1,6 @@
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
-use crate::proto::server::ProxyMessage;
+use crate::proto::generic::ProxyMessage;
 use crate::server::client::Client;
 
 pub struct ClientProxy;

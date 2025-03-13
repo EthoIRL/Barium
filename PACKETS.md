@@ -18,10 +18,6 @@ TcpStream connection will always be closed after calling this packet
 Indicates that the governor has successfully found a node for client-node communications. 
   - Id: 3
 
-### **ProxyMessage**
-Proto message within a message intended to be sent to the client corresponding node.
-  - Id: 10
-
 # Anticheat (NODE)
 
 ### NodeRegistration
@@ -41,11 +37,7 @@ TcpStream connection will always be closed after calling this packet
 Notifies the node that it should connect to a reverse proxy connection provided by the governor
   - Id: 3
 
-### **ProxyMessage**
-Proto message within a message intended to be sent to the node corresponding client.
-  - Id: 10
-
-# Game <-> Anticheat (Proxy)
+# Game -> Anticheat (Proxy)
 All packets within this hierarchy should be prefixed with ``Px_`` to denote proxied state skipping governor checks entirely.
 
 ### **DisconnectServer**
@@ -67,3 +59,15 @@ Player has moved position or changed ground status.
 ### PlayerRotation
 Player performed rotations.
 - Id: 4
+
+# Game <- Anticheat (Proxy)
+
+### PlayerWarn
+Notifies the server of a player being warned for cheating (alerts)
+- Id: 0
+
+# Generic
+
+### ProxyMessage
+Node <-> Client communication protocol, allows for the safeguard of data between the two hosts 
+- Id: 10
