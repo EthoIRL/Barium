@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package command;
+
+option java_multiple_files = true;
+
+message Px_PlayerWarn {
+  string uuid = 1;
+  string check_name = 2;
+  string check_type = 3;
+  int32 check_weight = 4;
+  bool check_experimental = 5;
+}
