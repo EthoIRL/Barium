@@ -14,7 +14,8 @@ MCJE 1.8 - 1.21 remote based anti cheat solution based in Rust
 - Prost
 
 ## V1 vs V2
-Uses a protobuf based communication protocol rather than a hand rolled layer
+Uses a protobuf based communication protocol rather than a hand rolled layer. <br>
+See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 
 ## Dependencies
 * Protoc - v29.3
