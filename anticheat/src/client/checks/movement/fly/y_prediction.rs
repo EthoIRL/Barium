@@ -13,6 +13,10 @@ impl GenericCheck for YPrediction {
             return;
         }
 
+        if player.allowed_flying && player.flying {
+            return;
+        }
+
         let position_0 = player.locational_position.get(0).unwrap();
         let position_1 = player.locational_position.get(1).unwrap();
         let position_2 = player.locational_position.get(2).unwrap();
