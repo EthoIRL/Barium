@@ -28,6 +28,7 @@ impl GenericCheck for YPrediction {
             println!("Difference: ({})", delta_difference);
 
             if delta_difference.abs() >= 0.1 {
+                Player::warn(player, game_server, Self::get_info());
             }
         }
     }
