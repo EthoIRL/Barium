@@ -8,6 +8,7 @@ use prost::Message;
 use uuid::Uuid;
 use crate::client::checks::check::GenericCheck;
 use crate::client::checks::movement::fly::y_prediction::YPrediction;
+use crate::client::checks::player::bad_packets::illegal_flying::IllegalFlying;
 use crate::client::state::game::GameServer;
 
 use crate::packet;
@@ -150,9 +151,16 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
                     continue;
                 };
 
+                // TODO: Should this run on its own thread?, maybe a tick system? imitating the server's tick rate?
+                // TODO: Or just handle on the respective packet?
+                // A - If this is ran on its own thread it could potentially lead to inconsistent checks & spamming.
+                // B - If this is ran on a tick based system this would semi-fix A's spamming of fails.
+                // C - If this ran on respective packets needed for the check this could fix A & B but might lead to performance issues or deadlocking 
+                // game_server.players
                 if let Ok(player_list) = game_server.players.read() {
                     for (_, player) in player_list.iter() {
                         YPrediction::handle(player, &game_server);
+                        IllegalFlying::handle(player, &game_server);
                     }
                 }
             }
