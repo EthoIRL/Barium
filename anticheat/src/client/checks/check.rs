@@ -20,6 +20,7 @@ pub struct CheckInfo {
 pub enum CheckType {
     Movement,
     Combat,
+    Player,
     Other
 }
 

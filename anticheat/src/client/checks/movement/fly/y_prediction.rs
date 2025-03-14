@@ -13,7 +13,7 @@ impl GenericCheck for YPrediction {
             return;
         }
 
-        if player.allowed_flying && player.flying {
+        if player.allowed_flying {
             return;
         }
 
