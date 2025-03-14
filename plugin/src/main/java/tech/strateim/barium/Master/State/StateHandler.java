@@ -6,6 +6,7 @@ import tech.strateim.barium.Master.Packet.Packet;
 import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.Remote;
 import tech.strateim.barium.Master.State.Disconnection.DisconnectionHandler;
+import tech.strateim.barium.Master.State.Proxy.ProxyHandler;
 import tech.strateim.barium.Master.State.Ready.ReadyHandler;
 import tech.strateim.barium.Master.State.Registration.RegistrationHandler;
 
@@ -35,6 +36,7 @@ public class StateHandler {
         stateHandlers.put(1, new RegistrationHandler(1, packetHandler, log, this));
         stateHandlers.put(2, new DisconnectionHandler(2, packetHandler, log, remote, this));
         stateHandlers.put(3, new ReadyHandler(3, packetHandler, log, serverState, this));
+        stateHandlers.put(10, new ProxyHandler(10, packetHandler, log, serverState));
     }
 
     public void StartReceiver() {
