@@ -6,7 +6,9 @@ import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.protobuf.Message;
+import tech.strateim.barium.Game.ServerState;
 import tech.strateim.barium.Listeners.Handlers.MovementHandler;
+import tech.strateim.barium.Listeners.Handlers.PlayerHandler;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Remote;
 
@@ -16,10 +18,12 @@ import java.util.logging.Logger;
 public class NetworkListener implements PacketListener {
     private final Remote Remote;
     private final Logger Log;
+    private final ServerState serverState;
 
-    public NetworkListener(Remote remote, Logger log) {
+    public NetworkListener(Remote remote, Logger log, ServerState serverState) {
         Remote = remote;
         Log = log;
+        this.serverState = serverState;
     }
 
     @Override
@@ -49,6 +53,10 @@ public class NetworkListener implements PacketListener {
 
         if (MovementHandler.IsRotation(id, clientVersion)) {
             MovementHandler.HandleRotation(userUuid, event, this);
+        }
+
+        if (PlayerHandler.IsClientAbilities(id, clientVersion)) {
+            PlayerHandler.HandleClientAbilities(userUuid, event, this, serverState.getClient(userUuid));
         }
     }
 

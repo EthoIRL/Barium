@@ -14,7 +14,7 @@ use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration::Response;
 use crate::proto::anticheat::NodeProxyNegotiation;
-use crate::proto::game::{PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
+use crate::proto::game::{PxPlayerClientAbilities, PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
 
 pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     let mut packet_id_buffer = [0u8; 2];
@@ -50,6 +50,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     packet_handles.insert(PxPlayerLeave::id(), PxPlayerLeave::handle);
     packet_handles.insert(PxPlayerMovement::id(), PxPlayerMovement::handle);
     packet_handles.insert(PxPlayerRotation::id(), PxPlayerRotation::handle);
+    packet_handles.insert(PxPlayerClientAbilities::id(), PxPlayerClientAbilities::handle);
 
     let arc_packet_handles = Arc::new(packet_handles);
 

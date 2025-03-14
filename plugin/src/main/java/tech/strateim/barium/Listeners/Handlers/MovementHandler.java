@@ -12,7 +12,6 @@ import tech.strateim.barium.Listeners.NetworkListener;
 import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Client.*;
 
 public class MovementHandler {
-
     public static void HandlePosition(String userUuid, PacketReceiveEvent event, NetworkListener networkListener) {
         WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
         Location location = flying.getLocation();

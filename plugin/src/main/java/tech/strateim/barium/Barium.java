@@ -39,7 +39,7 @@ public final class Barium extends JavaPlugin {
         ServerState = new ServerState(Log, getServer(), PeApi);
 
         PeApi.getEventManager().registerListener(new PlayerListener(Remote, ServerState), PacketListenerPriority.NORMAL);
-        PeApi.getEventManager().registerListener(new NetworkListener(Remote, Log), PacketListenerPriority.NORMAL);
+        PeApi.getEventManager().registerListener(new NetworkListener(Remote, Log, ServerState), PacketListenerPriority.NORMAL);
 
         Remote.ExecutorService.execute(() -> PacketHandler = Remote.Start("127.0.0.1", 3238, Server, ServerState, PeApi));
 
