@@ -112,8 +112,6 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerClientAbilities 
             return Err("Player's uuid cannot be empty... Malformed player leave packet.".into());
         }
 
-        println!("flying: {}, allowed: {}", client_abilities.flying, client_abilities.server_allowed);
-
         if let Ok(mut player_list) = game_server.players.write() {
             let (_, player) = player_list.iter_mut().find(|(uuid, _)| uuid == &&client_abilities.uuid)
                 .ok_or(format!("Unknown uuid received from within sub packet, ({})", client_abilities.uuid))?;
