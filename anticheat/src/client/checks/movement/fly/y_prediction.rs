@@ -27,7 +27,8 @@ impl GenericCheck for YPrediction {
 
             println!("Difference: ({})", delta_difference);
 
-            if delta_difference.abs() >= 0.1 {
+            // TODO: Block above head must be checked
+            if delta_difference.abs() >= 0.1 || delta_difference == 0.0784000015258789f64 {
                 Player::warn(player, game_server, Self::get_info());
             }
         }
