@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package player;
+
+option java_multiple_files = true;
+
+message Px_PlayerClientAbilities {
+  string uuid = 1;
+  bool flying = 2;
+  bool server_allowed = 3;
+}
+
+

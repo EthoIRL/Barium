@@ -10,4 +10,5 @@ pub mod game {
     include!(concat!(env!("OUT_DIR"), "/network.rs"));
     include!(concat!(env!("OUT_DIR"), "/movement.rs"));
     include!(concat!(env!("OUT_DIR"), "/command.rs"));
+    include!(concat!(env!("OUT_DIR"), "/player.rs"));
 }

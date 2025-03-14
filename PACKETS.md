@@ -60,6 +60,10 @@ Player has moved position or changed ground status.
 Player performed rotations.
 - Id: 4
 
+### PlayerClientAbilities
+Player changed abilities from client side. (Unsafe version)
+- Id: 5
+
 # Game <- Anticheat (Proxy)
 
 ### PlayerWarn
