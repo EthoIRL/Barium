@@ -36,7 +36,7 @@ public final class Barium extends JavaPlugin {
         PacketEvents.getAPI().load();
 
         PeApi = PacketEvents.getAPI();
-        ServerState = new ServerState(Log);
+        ServerState = new ServerState(Log, getServer(), PeApi);
 
         PeApi.getEventManager().registerListener(new PlayerListener(Remote, ServerState), PacketListenerPriority.NORMAL);
         PeApi.getEventManager().registerListener(new NetworkListener(Remote, Log), PacketListenerPriority.NORMAL);

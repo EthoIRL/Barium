@@ -12,8 +12,8 @@ import tech.strateim.barium.Master.Remote;
 import java.util.UUID;
 
 public class PlayerListener implements PacketListener {
-    private Remote Remote;
-    private ServerState ServerState;
+    private final Remote Remote;
+    private final ServerState ServerState;
 
     public PlayerListener(Remote remote, ServerState serverState) {
         Remote = remote;
@@ -34,7 +34,7 @@ public class PlayerListener implements PacketListener {
                 .setName(user.getName())
                 .build();
 
-        ServerState.getUsers().put(userUuid, user);
+        ServerState.addClient(userUuid, event.getPlayer(), event.getUser());
 
         Remote.GetPacketHandler().SendPacketRetry(playerJoin, 1, Remote.GetStateHandler().State);
     }
@@ -52,7 +52,7 @@ public class PlayerListener implements PacketListener {
                 .setUuid(userUuid.toString())
                 .build();
 
-        ServerState.getUsers().remove(userUuid);
+        ServerState.removeClient(userUuid);
 
         Remote.GetPacketHandler().SendPacketRetry(playerLeave, 2, Remote.GetStateHandler().State);
     }

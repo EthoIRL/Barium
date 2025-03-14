@@ -1,7 +1,7 @@
 package tech.strateim.barium.Master.State.Ready;
 
-import com.github.retrooper.packetevents.protocol.player.User;
 import network.Px_PlayerJoin;
+import tech.strateim.barium.Game.Clients.Client;
 import tech.strateim.barium.Game.ServerState;
 import tech.strateim.barium.Master.Enum.Status;
 import tech.strateim.barium.Master.Packet.Packet;
@@ -9,8 +9,6 @@ import tech.strateim.barium.Master.Packet.PacketHandler;
 import tech.strateim.barium.Master.State.AbstractState;
 import tech.strateim.barium.Master.State.StateHandler;
 
-import java.util.HashMap;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public class ReadyHandler extends AbstractState {
@@ -29,16 +27,12 @@ public class ReadyHandler extends AbstractState {
         log.warning("READY TO SEND");
         stateHandler.State = Status.Ready;
 
-        HashMap<UUID, User> users = serverState.getUsers();
-
-        for (UUID key: users.keySet()) {
-            User user = users.get(key);
-
-            log.warning("Registering: " + user.getName());
+        for (Client client: serverState.getAllClients()) {
+            log.warning("Registering: " + client.getPlayer().getName());
 
             Px_PlayerJoin playerJoin = Px_PlayerJoin.newBuilder()
-                    .setUuid(key.toString())
-                    .setName(user.getName())
+                    .setUuid(client.getUser().getUUID().toString())
+                    .setName(client.getUser().getName())
                     .build();
 
             packetHandler.SendPacketRetry(playerJoin, 1, stateHandler.State);
