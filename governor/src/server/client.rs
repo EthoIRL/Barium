@@ -191,7 +191,7 @@ pub fn negotiate_node_registration(node: &Arc<Node>, client: &mut Client) -> Res
         }
     };
 
-    let listener = match TcpListener::bind("127.0.0.1:0") {
+    let listener = match TcpListener::bind("0.0.0.0:0") {
         Ok(listener) => listener,
         Err(err) => {
             return Err(format!("Failed to create proxy listener, ({:#?})", err).into());
