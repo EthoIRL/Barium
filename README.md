@@ -10,12 +10,5 @@ See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 
 ## Dependencies
 * Protoc - v29.3
-
-## Stack
-#### MCJE Plugin:
-- Java 21 (MAVEN)
-- PacketEvents
-
-#### Governor:
-- Rust (MSRV 1.80)
-- Prost
+* Rust (Msrv 1.80)
+* Java 21 (Maven)
