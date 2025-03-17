@@ -30,7 +30,7 @@ impl GenericCheck for YPrediction {
                 let delta_y_1 = position_0.y - position_1.y;
                 let delta_y_2 = position_2.y - position_3.y;
 
-                // Must be on ground
+                // Must be off ground
                 if position_0.ground || position_1.ground ||
                     position_2.ground || position_3.ground {
                     return;
@@ -52,7 +52,7 @@ impl GenericCheck for YPrediction {
             r#type: CheckType::Movement,
             name: String::from("Y Prediction"),
             weight: 5,
-            experimental: false
+            experimental: true
         }
     }
 }
