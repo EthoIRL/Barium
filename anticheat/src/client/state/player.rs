@@ -33,6 +33,8 @@ pub struct RotationPosition {
 pub struct TickData {
     pub since_block_above_ticks: u64,
     pub since_block_below_ticks: u64,
+    pub since_in_liquid_ticks: u64,
+    pub since_in_web_ticks: u64,
     pub since_join_ticks: u64
 }
 
@@ -40,6 +42,8 @@ impl TickData {
     pub fn tick(&mut self) {
         self.since_block_above_ticks += 1;
         self.since_block_below_ticks += 1;
+        self.since_in_web_ticks += 1;
+        self.since_in_liquid_ticks += 1;
         self.since_join_ticks += 1;
     }
 }
@@ -49,6 +53,8 @@ impl Default for TickData {
         TickData {
             since_block_below_ticks: 0,
             since_block_above_ticks: 0,
+            since_in_web_ticks: 0,
+            since_in_liquid_ticks: 0,
             since_join_ticks: 0
         }
     }

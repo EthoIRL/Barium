@@ -19,6 +19,14 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerCollision {
             if player_collision.block_below {
                 player.tick_data.since_block_below_ticks = 0;
             }
+
+            if player_collision.in_liquid {
+                player.tick_data.since_in_liquid_ticks = 0;
+            }
+
+            if player_collision.in_web {
+                player.tick_data.since_in_web_ticks = 0;
+            }
         }
 
         Ok(())

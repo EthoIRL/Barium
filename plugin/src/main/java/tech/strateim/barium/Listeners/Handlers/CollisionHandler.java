@@ -33,14 +33,21 @@ public class CollisionHandler {
                 .anyMatch(block -> block.getType().isSolid());
         var blockAbove = downwardBlocks.stream()
                 .anyMatch(block -> block.getLocation().getY() - y >= 1.0);
+        var inWeb = downwardBlocks.stream()
+                .anyMatch(block -> block.getType() == Material.COBWEB);
+        var inLiquid = downwardBlocks.stream()
+                .anyMatch(block -> block.getType() == Material.WATER || block.getType() == Material.LAVA);
 
-        Px_PlayerCollision playerCollision = Px_PlayerCollision.newBuilder()
-                .setUuid(userUuid)
-                .setBlockBelow(solidGround)
-                .setBlockAbove(blockAbove)
-                .build();
-
-        networkListener.HandlePacket(playerCollision, 6);
+        if (solidGround || blockAbove || inWeb || inLiquid) {
+            Px_PlayerCollision playerCollision = Px_PlayerCollision.newBuilder()
+                    .setUuid(userUuid)
+                    .setBlockBelow(solidGround)
+                    .setBlockAbove(blockAbove)
+                    .setInWeb(inWeb)
+                    .setInLiquid(inLiquid)
+                    .build();
+            networkListener.HandlePacket(playerCollision, 6);
+        }
 
         downwardBlocks.clear();
     }

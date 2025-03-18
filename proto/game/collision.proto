@@ -8,4 +8,6 @@ message Px_PlayerCollision {
   string uuid = 1;
   bool blockAbove = 2;
   bool blockBelow = 3;
+  bool inWeb = 4;
+  bool inLiquid = 5;
 }
