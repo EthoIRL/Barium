@@ -19,6 +19,10 @@ impl GenericCheck for YPrediction {
             return;
         }
 
+        if player.tick_data.since_block_above_ticks < 25 {
+            return;
+        }
+
         // Get the last 4 player positions
         match (
             player.locational_position.get(0),
