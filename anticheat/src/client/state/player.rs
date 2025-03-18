@@ -147,6 +147,10 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerClientAbilities 
 
             player.flying = client_abilities.flying;
             player.allowed_flying = client_abilities.server_allowed;
+
+            for (_, player) in player_list.iter() {
+                IllegalFlying::handle(player, &game_server);
+            }
         }
 
         Ok(())
