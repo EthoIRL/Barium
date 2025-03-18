@@ -19,7 +19,11 @@ impl GenericCheck for YPrediction {
             return;
         }
 
-        if player.tick_data.since_block_above_ticks < 25 {
+        if player.tick_data.since_block_above_ticks < 25 || player.tick_data.since_join_ticks < 20 {
+            return;
+        }
+
+        if player.tick_data.since_in_liquid_ticks < 5 || player.tick_data.since_in_web_ticks < 5 {
             return;
         }
 

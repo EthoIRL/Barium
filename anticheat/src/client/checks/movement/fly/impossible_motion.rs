@@ -16,6 +16,10 @@ impl GenericCheck for ImpossibleMotion {
             return;
         }
 
+        if player.tick_data.since_join_ticks < 20 || player.tick_data.since_block_above_ticks < 10 {
+            return;
+        }
+
         match player.locational_position.get(0) {
             Some(position_0) => {
                 if position_0.ground != (position_0.y % (1f64 / 64f64) == 0f64) {
