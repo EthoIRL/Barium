@@ -53,6 +53,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     packet_handles.insert(PxPlayerMovement::id(), PxPlayerMovement::handle);
     packet_handles.insert(PxPlayerRotation::id(), PxPlayerRotation::handle);
     packet_handles.insert(PxPlayerClientAbilities::id(), PxPlayerClientAbilities::handle);
+    packet_handles.insert(PxPlayerCollision::id(), PxPlayerCollision::handle);
 
     let arc_packet_handles = Arc::new(packet_handles);
 

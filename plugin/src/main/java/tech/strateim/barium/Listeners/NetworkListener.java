@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.protobuf.Message;
 import tech.strateim.barium.Game.ServerState;
+import tech.strateim.barium.Listeners.Handlers.CollisionHandler;
 import tech.strateim.barium.Listeners.Handlers.MovementHandler;
 import tech.strateim.barium.Listeners.Handlers.PlayerHandler;
 import tech.strateim.barium.Master.Enum.Status;
@@ -57,6 +58,10 @@ public class NetworkListener implements PacketListener {
 
         if (PlayerHandler.IsClientAbilities(id, clientVersion)) {
             PlayerHandler.HandleClientAbilities(userUuid, event, this, serverState.getClient(userUuid));
+        }
+
+        if (CollisionHandler.IsClientCollision(id, clientVersion)) {
+            CollisionHandler.HandleCollision(userUuid, event, this, serverState.getClient(userUuid));
         }
     }
 

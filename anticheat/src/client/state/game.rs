@@ -18,6 +18,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxServerTick {
     fn handle(game_server: &mut Arc<GameServer>, packet: GenericPacket) -> Result<(), Box<dyn std::error::Error>> {
         if let Ok(mut player_list) = game_server.players.write() {
             player_list.iter_mut().for_each(|(_, player)| {
+                player.tick_data.tick();
             });
         }
 
