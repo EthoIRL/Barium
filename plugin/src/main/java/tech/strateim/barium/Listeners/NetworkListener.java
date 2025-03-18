@@ -48,6 +48,10 @@ public class NetworkListener implements PacketListener {
     public void InvokePacketMatch(User user, ClientVersion clientVersion, int id, PacketReceiveEvent event) {
         String userUuid = user.getUUID().toString();
 
+        if (CollisionHandler.IsClientCollision(id, clientVersion)) {
+            CollisionHandler.HandleCollision(userUuid, event, this, serverState.getClient(userUuid));
+        }
+
         if (MovementHandler.IsPosition(id, clientVersion)) {
             MovementHandler.HandlePosition(userUuid, event, this);
         }
@@ -58,10 +62,6 @@ public class NetworkListener implements PacketListener {
 
         if (PlayerHandler.IsClientAbilities(id, clientVersion)) {
             PlayerHandler.HandleClientAbilities(userUuid, event, this, serverState.getClient(userUuid));
-        }
-
-        if (CollisionHandler.IsClientCollision(id, clientVersion)) {
-            CollisionHandler.HandleCollision(userUuid, event, this, serverState.getClient(userUuid));
         }
     }
 
