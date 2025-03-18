@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use circular_buffer::CircularBuffer;
-use crate::client::checks::check::CheckInfo;
+use crate::client::checks::check::{CheckInfo, GenericCheck};
+use crate::client::checks::player::bad_packets::illegal_flying::IllegalFlying;
 use crate::client::state::game::GameServer;
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
@@ -12,7 +13,8 @@ pub struct Player {
     pub locational_position: CircularBuffer<20, LocationPosition>,
     pub rotational_position: CircularBuffer<20, RotationPosition>,
     pub flying: bool,
-    pub allowed_flying: bool
+    pub allowed_flying: bool,
+    pub tick_data: TickData
 }
 
 pub struct LocationPosition {
@@ -27,6 +29,31 @@ pub struct RotationPosition {
     pub yaw: f32,
     pub pitch: f32,
 }
+
+pub struct TickData {
+    pub since_block_above_ticks: u64,
+    pub since_block_below_ticks: u64,
+    pub since_join_ticks: u64
+}
+
+impl TickData {
+    pub fn tick(&mut self) {
+        self.since_block_above_ticks += 1;
+        self.since_block_below_ticks += 1;
+        self.since_join_ticks += 1;
+    }
+}
+
+impl Default for TickData {
+    fn default() -> Self {
+        TickData {
+            since_block_below_ticks: 0,
+            since_block_above_ticks: 0,
+            since_join_ticks: 0
+        }
+    }
+}
+
 
 impl Player {
     pub fn warn(&self, server: &Arc<GameServer>, check_info: CheckInfo) {
@@ -58,7 +85,8 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerJoin {
             locational_position: CircularBuffer::new(),
             rotational_position: CircularBuffer::new(),
             flying: false,
-            allowed_flying: false
+            allowed_flying: false,
+            tick_data: TickData::default()
         };
 
         match game_server.players.write() {

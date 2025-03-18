@@ -12,6 +12,13 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerCollision {
             let (_, player) = player_list.iter_mut().find(|(uuid, _)| uuid == &&player_collision.uuid)
                 .ok_or(format!("Unknown uuid received from within sub packet, ({})", player_collision.uuid))?;
 
+            if player_collision.block_above {
+                player.tick_data.since_block_above_ticks = 0;
+            }
+
+            if player_collision.block_below {
+                player.tick_data.since_block_below_ticks = 0;
+            }
         }
 
         Ok(())
