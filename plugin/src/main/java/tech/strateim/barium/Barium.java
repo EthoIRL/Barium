@@ -10,6 +10,7 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.strateim.barium.Game.ServerState;
+import tech.strateim.barium.Game.TickManager;
 import tech.strateim.barium.Listeners.NetworkListener;
 import tech.strateim.barium.Listeners.PlayerListener;
 import tech.strateim.barium.Master.Remote;
@@ -24,6 +25,7 @@ public final class Barium extends JavaPlugin {
     public Remote Remote;
     public PacketHandler PacketHandler;
     public ServerState ServerState;
+    public TickManager TickManager;
 
     @Override
     public void onLoad() {
@@ -31,6 +33,7 @@ public final class Barium extends JavaPlugin {
         Server = getServer();
 
         Remote = new Remote(this, Log);
+        TickManager =new TickManager(this, Remote);
 
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
@@ -50,10 +53,12 @@ public final class Barium extends JavaPlugin {
     @Override
     public void onEnable() {
         PacketEvents.getAPI().init();
+        TickManager.Start();
     }
 
     @Override
     public void onDisable() {
+        TickManager.Stop();
         Remote.Disconnect(DisconnectReason.Shutdown);
         Remote.Shutdown();
 

@@ -15,7 +15,7 @@ use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration::Response;
 use crate::proto::anticheat::NodeProxyNegotiation;
-use crate::proto::game::{PxPlayerClientAbilities, PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation};
+use crate::proto::game::{PxPlayerClientAbilities, PxPlayerCollision, PxPlayerJoin, PxPlayerLeave, PxPlayerMovement, PxPlayerRotation, PxServerTick};
 
 pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     let mut packet_id_buffer = [0u8; 2];
@@ -47,6 +47,7 @@ pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream
     let mut data_length_buffer = [0u8; 4];
 
     let mut packet_handles: HashMap<u16, fn(&mut Arc<GameServer>, GenericPacket) -> Result<(), Box<dyn std::error::Error>>> = HashMap::new();
+    packet_handles.insert(PxServerTick::id(), PxServerTick::handle);
     packet_handles.insert(PxPlayerJoin::id(), PxPlayerJoin::handle);
     packet_handles.insert(PxPlayerLeave::id(), PxPlayerLeave::handle);
     packet_handles.insert(PxPlayerMovement::id(), PxPlayerMovement::handle);
