@@ -64,6 +64,14 @@ Player performed rotations.
 Player changed abilities from client side. (Unsafe version)
 - Id: 5
 
+### PlayerCollision
+Player collision has changed
+- Id: 6
+
+### ServerTick
+Server has performed a tick update
+- Id: 7
+
 # Game <- Anticheat (Proxy)
 
 ### PlayerWarn

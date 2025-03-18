@@ -12,3 +12,5 @@ message Px_PlayerJoin {
 message Px_PlayerLeave {
   string uuid = 1;
 }
+
+message Px_ServerTick {}
