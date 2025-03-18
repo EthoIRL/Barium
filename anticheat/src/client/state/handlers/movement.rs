@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use crate::client::checks::check::GenericCheck;
+use crate::client::checks::movement::fly::impossible_motion::ImpossibleMotion;
 use crate::client::checks::movement::fly::y_prediction::YPrediction;
 use crate::client::state::game::GameServer;
 use crate::client::state::player::{LocationPosition, RotationPosition};
@@ -22,6 +23,7 @@ impl GenericHandler<Arc<GameServer>, GenericPacket> for PxPlayerMovement {
 
             for (_, player) in player_list.iter() {
                 YPrediction::handle(player, &game_server);
+                ImpossibleMotion::handle(player, &game_server);
             }
         }
 

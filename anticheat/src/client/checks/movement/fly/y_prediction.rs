@@ -42,7 +42,6 @@ impl GenericCheck for YPrediction {
 
                 let delta_difference = delta_y_1 - ((delta_y_2 - ENTITY_GRAVITY) * MOVEMENT_MULTIPLIER);
 
-                // TODO: Block above head must be checked
                 if delta_difference.abs() >= 0.1 || delta_difference == 0.0784000015258789f64 {
                     Player::warn(player, game_server, Self::get_info());
                 }
