@@ -12,3 +12,19 @@ See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 * Protoc - v29.3
 * Rust (Msrv 1.80)
 * Java 21 (Maven)
+
+## TODO
+- [X] Modularity & Scalability
+  - Anticheat - Governor - Plugin 
+  - Multi anticheat, Single Governor, Multi Plugin
+- [X] Cross module communication
+- [X] Reverse proxy communication
+- [ ] Connection load balancing
+- [x] Multithreading by default
+- [ ] Secure authentication
+- [ ] Secure communications
+- [X] Anticheat Checks
+- [X] Player warning
+- [X] Connection fully fail-safe
+- [X] Windows/Linux cross compilation
+- [ ] Command line arguments
