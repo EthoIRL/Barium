@@ -27,6 +27,9 @@ Indicates that the governor has successfully found a node for client-node commun
   - **Response**
     Indicates to the node that the governor either accepted or denied the registration
     - Id: 1
+  - **EncryptionSync**
+    Notifies the node of the agreed upon RSA public key used for secure authentication
+    - Id: 4
 
 ### **DisconnectNode**
 Notifies the remote node that a forceful disconnection occurred on the governor side. \
