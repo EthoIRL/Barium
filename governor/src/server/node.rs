@@ -17,7 +17,8 @@ pub struct Node {
     pub connected: Arc<RwLock<bool>>,
     pub id: Uuid,
     pub ip_addr: IpAddr,
-    pub status: Arc<RwLock<NodeStatus>>
+    pub status: Arc<RwLock<NodeStatus>>,
+    pub shared_key: String
 }
 
 #[derive(PartialEq)]
@@ -26,7 +27,7 @@ pub enum NodeStatus {
     Ready,
 }
 
-pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<(), Error> {
+pub fn start_node_server(address: (&str, u16), node_key: String, node_list: Arc<RwLock<HashMap<Uuid, Arc<Node>>>>) -> Result<(), Error> {
     let listener = TcpListener::bind(address)?;
 
     thread::spawn(move || {
@@ -50,7 +51,8 @@ pub fn start_node_server(address: (&str, u16), node_list: Arc<RwLock<HashMap<Uui
                     connected: Arc::new(RwLock::new(true)),
                     id: node_id.clone(),
                     ip_addr: peer_address,
-                    status: Arc::new(RwLock::new(NodeStatus::Authenticating))
+                    status: Arc::new(RwLock::new(NodeStatus::Authenticating)),
+                    shared_key: node_key.clone()
                 });
 
                 let node_clone = node.clone();

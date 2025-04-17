@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use crate::{API_VERSION, NODE_KEY, packet};
+use crate::{API_VERSION, packet};
 use crate::error::RegistrationError;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::node_registration;
@@ -20,7 +20,7 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
             }.into());
         }
 
-        let shared_key_status = registration_packet.shared_key == NODE_KEY;
+        let shared_key_status = registration_packet.shared_key == node.shared_key;
 
         let response = node_registration::Response {
             succeeded: shared_key_status,
