@@ -8,6 +8,7 @@ prost = "0.13.4"
 uuid = { version = "1.11.0", features = ["v4"] }
 circular-buffer = "=0.1.9"
 encoding_rs = "0.8.35"
+structopt = "0.3.26"
 
 [build-dependencies]
 prost-build = "0.13.4"

@@ -42,7 +42,7 @@ pub fn handle_registration(stream: &mut TcpStream) -> Result<(), Error> {
     unreachable!()
 }
 
-pub fn start_client_server(governor_address: (&str, u16), stream: &mut TcpStream, game_servers: Arc<RwLock<HashMap<Uuid, Arc<GameServer>>>>) {
+pub fn start_client_server(governor_address: (String, u16), stream: &mut TcpStream, game_servers: Arc<RwLock<HashMap<Uuid, Arc<GameServer>>>>) {
     let mut packet_id_buffer = [0u8; 2];
     let mut data_length_buffer = [0u8; 4];
 
