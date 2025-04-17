@@ -37,7 +37,6 @@ pub struct GenericArguments {
 
 fn main() {
     let arguments: GenericArguments = GenericArguments::from_args();
-    println!("{:?}", arguments);
 
     let client_arguments= arguments.remote_client_address.split(":").collect::<Vec<_>>();
     let client_address = (*client_arguments.first().unwrap(), u16::from_str(*client_arguments.last().unwrap()).unwrap());
