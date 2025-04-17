@@ -20,8 +20,8 @@ See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 - [X] Cross module communication
 - [X] Reverse proxy communication
 - [ ] Connection load balancing
-- [x] Multithreading by default
-- [ ] Secure authentication
+- [X] Multithreading by default
+- [X] Secure authentication
 - [ ] Secure communications
 - [X] Anticheat Checks
 - [X] Player warning
