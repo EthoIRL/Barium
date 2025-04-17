@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use rsa::Pkcs1v15Encrypt;
 use crate::{API_VERSION, packet};
 use crate::error::RegistrationError;
 use crate::packet::{GenericHandler, GenericPacket};
@@ -20,7 +21,25 @@ impl GenericHandler<Arc<Node>, GenericPacket> for NodeRegistar {
             }.into());
         }
 
-        let shared_key_status = registration_packet.shared_key == node.shared_key;
+        let decoded_key = encoding_rs::mem::encode_latin1_lossy(&registration_packet.shared_key);
+
+        let shared_key_vec = match node.private_key.decrypt(Pkcs1v15Encrypt, &*decoded_key) {
+            Ok(key) => key,
+            Err(err) => {
+                println!("[GOV] [NODE] Failed to decrypt shared key ({})", err);
+                return Err(RegistrationError::BadResponse.into());
+            }
+        };
+
+        let remote_shared_key = match String::from_utf8(shared_key_vec) {
+            Ok(key) => key,
+            Err(err) => {
+                println!("[GOV] [NODE] Failed to transform bytes to string during key decryption phase. ({})", err);
+                return Err(RegistrationError::BadResponse.into());
+            }
+        };
+
+        let shared_key_status = remote_shared_key == node.shared_key;
 
         let response = node_registration::Response {
             succeeded: shared_key_status,

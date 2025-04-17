@@ -4,11 +4,14 @@ use std::io::Error;
 use std::io::ErrorKind::ConnectionReset;
 use std::net::{IpAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, RwLock};
+use rsa::{RsaPrivateKey, RsaPublicKey};
+use rsa::pkcs8::{EncodePublicKey, LineEnding};
 use uuid::Uuid;
 use crate::anticheat::registration::NodeRegistar;
 use crate::packet;
 use crate::packet::{GenericHandler, GenericPacket};
 use crate::proto::anticheat::{DisconnectNode, NodeResources};
+use crate::proto::anticheat::node_registration::EncryptionSync;
 use crate::proto::generic::DisconnectReason;
 
 pub struct Node {
@@ -18,7 +21,9 @@ pub struct Node {
     pub id: Uuid,
     pub ip_addr: IpAddr,
     pub status: Arc<RwLock<NodeStatus>>,
-    pub shared_key: String
+    pub shared_key: String,
+    pub private_key: RsaPrivateKey,
+    pub public_key: RsaPublicKey
 }
 
 #[derive(PartialEq)]
@@ -32,7 +37,7 @@ pub fn start_node_server(address: (&str, u16), node_key: String, node_list: Arc<
 
     thread::spawn(move || {
         for stream in listener.incoming() {
-            if let Ok(tcp_stream) = stream {
+            if let Ok(mut tcp_stream) = stream {
                 let peer_address = match tcp_stream.peer_addr() {
                     Ok(addr) => addr.ip(),
                     Err(err) => {
@@ -45,6 +50,26 @@ pub fn start_node_server(address: (&str, u16), node_key: String, node_list: Arc<
 
                 let node_id = Uuid::new_v4();
 
+                let mut rng = rand::thread_rng();
+                let private_key = match RsaPrivateKey::new(&mut rng, 2048) {
+                    Ok(key) => key,
+                    Err(err) => {
+                        eprintln!("Failed to generate rsa-private key. ({})", err);
+                        continue;
+                    }
+                };
+                let public_key = RsaPublicKey::from(&private_key);
+
+                let public_key_string = match public_key.to_public_key_pem(LineEnding::LF) {
+                    Ok(key) => key,
+                    Err(err) => {
+                        eprintln!("[GOV] [NODE] Failed to generate string pem form of public key. ({})", err);
+                        continue;
+                    }
+                };
+
+                println!("Gen: {}", public_key_string);
+
                 let node = Arc::new(Node {
                     origin_stream: tcp_stream.try_clone().unwrap(),
                     resources: Arc::new(Mutex::new(None)),
@@ -52,8 +77,17 @@ pub fn start_node_server(address: (&str, u16), node_key: String, node_list: Arc<
                     id: node_id.clone(),
                     ip_addr: peer_address,
                     status: Arc::new(RwLock::new(NodeStatus::Authenticating)),
-                    shared_key: node_key.clone()
+                    shared_key: node_key.clone(),
+                    private_key,
+                    public_key
                 });
+
+                if let Err(err) = packet::send_packet(EncryptionSync {
+                    public_key: public_key_string.clone()
+                }, 4, &mut tcp_stream) {
+                    eprintln!("[GOV] [NODE] Failed to send public key for further authentication. ({})", err);
+                    continue;
+                };
 
                 let node_clone = node.clone();
 

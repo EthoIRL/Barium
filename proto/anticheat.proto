@@ -7,6 +7,9 @@ option java_multiple_files = true;
 import "generic.proto";
 
 message NodeRegistration {
+  message EncryptionSync {
+    string PublicKey = 1;
+  }
   message Register {
     int32 NodeVersion = 1;
     string SharedKey = 2;
