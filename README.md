@@ -27,4 +27,4 @@ See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 - [X] Player warning
 - [X] Connection fully fail-safe
 - [X] Windows/Linux cross compilation
-- [ ] Command line arguments
+- [X] Command line arguments
