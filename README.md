@@ -28,3 +28,4 @@ See [PACKETS.md](PACKETS.md) for general proto id & descriptors for each packet.
 - [X] Connection fully fail-safe
 - [X] Windows/Linux cross compilation
 - [X] Command line arguments
+- [ ] Analytics / Statistics
